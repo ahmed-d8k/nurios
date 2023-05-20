@@ -13,7 +13,7 @@ import {
     Scripts,
     Title,
 } from "solid-start";
-import "./root.css";
+import "./app-styles.css";
 
 export default function Root() {
     const location = useLocation();

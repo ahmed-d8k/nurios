@@ -150,8 +150,8 @@ export const AppCanvas = () => {
                 Image canvas not loaded
             </canvas>
             <div class={"my-4 gap-4 flex"}>
-                <button class="text-gray-300 hover:text-sky-600" onclick={handleResetButton}>Reset</button>
-                <button class="text-gray-300 hover:text-sky-600" onclick={handleUndoButton}>Undo</button>
+                <button class="btn-action" onclick={handleResetButton}>Reset</button>
+                <button class="btn-action" onclick={handleUndoButton}>Undo</button>
             </div>
         </>
     )

@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .btn-action {
+        @apply text-gray-300 hover:text-sky-600;
+    }
+
+    .basic-text {
+        @apply text-sm text-neutral-500;
+    }
+}

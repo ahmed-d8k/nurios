@@ -12,8 +12,8 @@ export default function Home() {
                 Tips
             </p>
             <ul class={"mb-8"}>
-                <li class={"text-sm text-neutral-500"}>- Press ctrl + Z to undo last box</li>
-                <li class={"text-sm text-neutral-500"}>- Press Esc to stop drawing</li>
+                <li class={"basic-text"}>- Press ctrl + Z to undo last box</li>
+                <li class={"basic-text"}>- Press Esc to stop drawing</li>
             </ul>
             <AppCanvas/>
             <p class="my-4 flex gap-2">
