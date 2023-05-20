@@ -4,10 +4,16 @@
 
 @layer components {
     .btn-action {
+        transition: .2s;
         @apply text-gray-300 hover:text-sky-600;
+        @apply disabled:text-gray-700;
     }
 
     .basic-text {
         @apply text-sm text-neutral-500;
     }
+
+    /*.input {*/
+    /*    @apply outline-none bg-none;*/
+    /*}*/
 }

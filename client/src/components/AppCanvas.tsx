@@ -2,10 +2,15 @@ import {createSignal, onMount} from "solid-js";
 
 const canvasId = "main-canvas";
 
+type HTMLElementEvent<T extends HTMLElement> = MouseEvent & {
+    target: T;
+}
+type CanvasMouseEvent = HTMLElementEvent<HTMLCanvasElement>;
+
 const canvasWidth = 300;
 const canvasHeight = 300;
-type BoxDrawing = {startX: number, startY: number, width: number, height: number};
-const getUsefulDataFromEvent = (e: MouseEvent) => ({
+type BoxDrawing = { startX: number, startY: number, width: number, height: number };
+const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
     mouseX: e.offsetX,
     mouseY: e.offsetY
 })
@@ -14,8 +19,8 @@ const [firstPoint, setFirstPoint] = createSignal<[number, number] | null>(null)
 const firstPointExists = () => firstPoint() !== null;
 const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
 
-const [canvasCtx, setCanvasCtx] = createSignal(null);
-const [canvasRect, setCanvasRect] = createSignal(null);
+const [canvasCtx, setCanvasCtx] = createSignal<CanvasRenderingContext2D | null>(null);
+const [canvasRect, setCanvasRect] = createSignal<DOMRect | null>(null);
 
 const setStrokeStyle = (color: string) => {
     const ctx = canvasCtx();
@@ -24,15 +29,15 @@ const setStrokeStyle = (color: string) => {
 }
 const setDrawStyle = () => setStrokeStyle("#000000");
 const setDrawingStyle = () => setStrokeStyle("#FF0800");
-const setUpDrawing = () => {
-    const canvas = document.getElementById<HTMLCanvasElement>(canvasId);
+const setupDrawing = () => {
+    const canvas = document.querySelector<HTMLCanvasElement>(`#${canvasId}`);
     const rect = canvas.getBoundingClientRect();
     const ctx = canvas?.getContext("2d");
     setCanvasCtx(ctx);
     setCanvasRect(rect);
     // canvas.style.cursor = "crosshair"y
 
-    if (canvas?.getContext) {
+    if (ctx) {
         ctx.fillStyle = "rgb(200, 0, 0)";
         ctx.fillRect(10, 10, 50, 50);
 
@@ -42,7 +47,7 @@ const setUpDrawing = () => {
         ctx.strokeRect(45, 45, 60, 60);
     }
 
-    const handleMouseDown = (e: MouseEvent) => {
+    const handleMouseDown = (e: CanvasMouseEvent) => {
         if (e.target.id !== canvasId) return;
         const {mouseX, mouseY} = getUsefulDataFromEvent(e);
 
@@ -50,7 +55,7 @@ const setUpDrawing = () => {
         canvas.style.cursor = "crosshair";
     }
 
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = (e: CanvasMouseEvent) => {
         if (e.target.id !== canvasId) return;
 
         /* this means the user started the click outside the canvas */
@@ -76,7 +81,7 @@ const setUpDrawing = () => {
         return setFirstPoint(null);
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: CanvasMouseEvent) => {
         if (e.target.id != canvasId) return;
         if (!firstPointExists()) return;
 
@@ -110,6 +115,45 @@ const setUpDrawing = () => {
     window.addEventListener("keydown", handleKeyPress, false);
 }
 
+const defaultImageData = {
+  width: 300,
+  height: 300,
+  src: null as string | null,
+};
+const [imageData, setImageData] = createSignal(defaultImageData);
+const setupUpload = () => {
+    const inputEle = document.querySelector("#upload-input");
+
+    const handleImageLoaded = (e) => {
+        if (e.target.files.length === 0) return;
+        const ctx = canvasCtx();
+        if (!ctx) return;
+
+        const file = e.target.files[0]; /* only allow 1 file uploaded */
+
+        const fr = new FileReader();
+        fr.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(fr.result, 0, 0, img.width, img.height)
+                setImageData({
+                    width: img.width,
+                    height: img.height,
+                    data: img.src
+                });
+            }
+            img.src = fr.result;
+        };
+        fr.readAsDataURL(file);
+
+        console.log("e", e);
+        console.log("files", e.target.files)
+    }
+
+    inputEle.addEventListener("change", handleImageLoaded)
+    /* TODO: handle err */
+}
+
 /* instead of drawing rectangles on top of the canvas, we redraw after every submitted action
 * this allows us to do things like undo, show drawing rectangle, change color, change dimensions, etc. more easily by just manipulating state
 * */
@@ -128,9 +172,11 @@ const redrawAllBoxes = () => {
 }
 
 const handleResetButton = () => {
-    if (!canvasCtx()) return;
+    const ctx = canvasCtx();
+    if (!ctx) return;
 
-    canvasCtx().reset();
+    // @ts-ignore
+    ctx.reset();
     setBoxes([]);
 }
 
@@ -141,17 +187,40 @@ const handleUndoButton = () => {
     redrawAllBoxes();
 }
 
+const handleChangeImageButton = () => {
+    if (!canvasCtx()) return;
+}
+
 export const AppCanvas = () => {
-    onMount(() => setUpDrawing());
+    onMount(() => setupDrawing());
+    onMount(() => setupUpload())
 
     return (
         <>
-            <canvas id={canvasId} width={canvasWidth} height={canvasHeight} class={"bg-red-400 relative"} >
+            <canvas
+                id={canvasId}
+                width={imageData().width}
+                height={imageData().height}
+                class={"relative shadow-md"}
+            >
                 Image canvas not loaded
             </canvas>
-            <div class={"my-4 gap-4 flex"}>
-                <button class="btn-action" onclick={handleResetButton}>Reset</button>
-                <button class="btn-action" onclick={handleUndoButton}>Undo</button>
+            <div class={"flex flex-col items-center"}>
+                <div class={"mt-4 gap-4 flex w-full text-center"}>
+                    <input
+                        class="input"
+                        onclick={handleChangeImageButton}
+                        type={"file"}
+                        accept={"image/*"}
+                        id={"upload-input"}
+                    >
+                        Change Image
+                    </input>
+                </div>
+                <div class={"mb-4 mt-2 gap-4 flex"}>
+                    <button class="btn-action" onclick={handleResetButton}>Reset</button>
+                    <button class="btn-action" onclick={handleUndoButton} disabled={boxes().length === 0}>Undo</button>
+                </div>
             </div>
         </>
     )
