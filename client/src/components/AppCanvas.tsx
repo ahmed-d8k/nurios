@@ -7,9 +7,12 @@ type HTMLElementEvent<T extends HTMLElement> = MouseEvent & {
 }
 type CanvasMouseEvent = HTMLElementEvent<HTMLCanvasElement>;
 
-const canvasWidth = 300;
-const canvasHeight = 300;
-type BoxDrawing = { startX: number, startY: number, width: number, height: number };
+type BoxDrawing = {
+    startX: number,
+    startY: number,
+    width: number,
+    height: number
+};
 const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
     mouseX: e.offsetX,
     mouseY: e.offsetY
@@ -35,7 +38,6 @@ const setupDrawing = () => {
     const ctx = canvas?.getContext("2d");
     setCanvasCtx(ctx);
     setCanvasRect(rect);
-    // canvas.style.cursor = "crosshair"y
 
     if (ctx) {
         ctx.fillStyle = "rgb(200, 0, 0)";
@@ -116,9 +118,9 @@ const setupDrawing = () => {
 }
 
 const defaultImageData = {
-  width: 300,
-  height: 300,
-  src: null as string | null,
+    width: 300,
+    height: 300,
+    src: null as string | null,
 };
 const [imageData, setImageData] = createSignal(defaultImageData);
 const setupUpload = () => {
@@ -131,20 +133,31 @@ const setupUpload = () => {
 
         const file = e.target.files[0]; /* only allow 1 file uploaded */
 
-        const fr = new FileReader();
-        fr.onload = () => {
-            const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(fr.result, 0, 0, img.width, img.height)
-                setImageData({
-                    width: img.width,
-                    height: img.height,
-                    data: img.src
-                });
-            }
-            img.src = fr.result;
-        };
-        fr.readAsDataURL(file);
+        const img = new Image();
+        img.onload = () => {
+            setImageData({
+                width: img.width,
+                height: img.height,
+                data: img
+            });
+            ctx.drawImage(img, 0, 0);
+        }
+        img.src = URL.createObjectURL(file);
+
+        // const reader = new FileReader();
+        // reader.onload = (re) => {
+        //     const img = new Image();
+        //     img.onload = () => {
+        //         ctx.drawImage(img, 0, 0)
+        //         setImageData({
+        //             width: img.width,
+        //             height: img.height,
+        //             data: img.src
+        //         });
+        //     }
+        //     img.src = re.target.result;
+        // };
+        // reader.readAsDataURL(e.target.files[0]);
 
         console.log("e", e);
         console.log("files", e.target.files)
@@ -161,8 +174,10 @@ const redrawAllBoxes = () => {
     const ctx = canvasCtx();
     const rect = canvasRect();
     if (!ctx || !rect) return;
+    const {data: imgData} = imageData();
 
     ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.drawImage(imgData, 0, 0);
     boxes().forEach(box => {
         ctx.beginPath();
         ctx.rect(box.startX, box.startY, box.width, box.height);
