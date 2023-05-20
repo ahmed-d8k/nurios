@@ -41,6 +41,14 @@ export const Canvas = () => {
     const [canvasRect, setCanvasRect] = createSignal(null);
     const [canvasLastMovePoint, setCanvasLastMovePoint] = createSignal(null);
 
+    const setStrokeStyle = (color: string) => {
+        const ctx = canvasCtx();
+        if (!ctx) return;
+        ctx.strokeStyle = color;
+    }
+    const setDrawStyle = () => setStrokeStyle("#000000");
+    const setDrawingStyle = () => setStrokeStyle("#FF0800");
+
 
     /* instead of drawing rectangles on top of the canvas, we redraw after every submitted action
     * this allows us to do things like undo, show drawing rectangle, change color, change dimensions, etc. more easily by just manipulating state
@@ -54,7 +62,7 @@ export const Canvas = () => {
         boxes().forEach(box => {
             ctx.beginPath();
             ctx.rect(box.startX, box.startY, box.width, box.height);
-            ctx.strokeStyle = "#000000";
+            setDrawStyle();
             ctx.stroke();
         })
     }
@@ -94,7 +102,7 @@ export const Canvas = () => {
             console.log("drawing from ", firstPoint(), "to", mouseX, mouseY)
 
             const [startX, startY] = firstPoint();
-            ctx.fillStyle = "#000000";
+            setDrawStyle();
             ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
             setFirstPoint(null);
             // setBoxes(prev => [...prev, []])
@@ -219,7 +227,7 @@ export const Canvas = () => {
 
             ctx.beginPath();
             ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
-            ctx.strokeStyle = "#000000";
+            setDrawingStyle();
             ctx.stroke();
             // ctx.beginPath()
         }
