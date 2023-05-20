@@ -189,7 +189,7 @@ export const Canvas = () => {
         }
 
         /* instead of drawing rectangles on top of the canvas, we redraw after every submitted action
-        * this allows us to do things like undo, change color, change dimensions, etc. more easily by just manipulating state
+        * this allows us to do things like undo, show drawing rectangle, change color, change dimensions, etc. more easily by just manipulating state
         * */
         const redrawAllBoxes = () => {
             ctx.clearRect(0, 0, rect.width, rect.height);
@@ -202,27 +202,22 @@ export const Canvas = () => {
         }
 
         const handleMouseMove = (e: MouseEvent) => {
-            if (e.target.id !== canvasId) return;
-
+            if (e.target.id != canvasId) return;
             if (!firstPointExists()) return;
+
+            redrawAllBoxes();
 
             const {mouseX, mouseY} = getUsefulDataFromEvent(e);
             const [startX, startY] = firstPoint();
 
-
-            // drawRect(e);
-            // const canvasAsImage = new Image();
-            // canvasAsImage.src = canvasLastMovePoint();
-            // canvasAsImage.onload = () => ctx.drawImage(canvasAsImage, 0, 0);
-            // ctx.restore();
-            // ctx.rect(mouseX, mouseY, mouseX - startX, mouseY - startY);
-            // ctx.stroke();
-            // ctx.save();
-            // ctx.resetTransform();
-            // ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
+            ctx.beginPath();
+            ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
+            ctx.strokeStyle = "#000000";
+            ctx.stroke();
+            // ctx.beginPath()
         }
 
-        // canvas.addEventListener("mousemove", handleMouseMove, false);
+        canvas.addEventListener("mousemove", handleMouseMove, false);
         canvas.addEventListener("mousedown", handleMouseDown, false);
         canvas.addEventListener("mouseup", handleMouseUp, false);
         // canvas.addEventListener("mousemove", handleMouseMove, false);
@@ -237,7 +232,7 @@ export const Canvas = () => {
         if (!canvasCtx()) return;
 
         canvasCtx().reset();
-        /* TODO: get rid of boxes in list */
+        setBoxes([]);
     }
 
     return (
