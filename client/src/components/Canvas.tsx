@@ -225,16 +225,29 @@ export const Canvas = () => {
             const {mouseX, mouseY} = getUsefulDataFromEvent(e);
             const [startX, startY] = firstPoint();
 
+            /* draw a dashed line with set color while dragging, then reset back to original rectangle style */
+            ctx.save();
             ctx.beginPath();
-            ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
             setDrawingStyle();
-            ctx.stroke();
-            // ctx.beginPath()
+            ctx.setLineDash([6]);
+            ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
+            ctx.restore();
+        }
+
+        const handleKeyPress = (e: KeyboardEvent) => {
+            console.log("e", e);
+            if (e.code === "Escape") {
+                setFirstPoint(null);
+                redrawAllBoxes();
+                canvas.style.cursor = "default";
+            }
         }
 
         canvas.addEventListener("mousemove", handleMouseMove, false);
         canvas.addEventListener("mousedown", handleMouseDown, false);
         canvas.addEventListener("mouseup", handleMouseUp, false);
+        /* keypress doesn't fire when escape is pressed */
+        window.addEventListener("keydown", handleKeyPress, false);
         // canvas.addEventListener("mousemove", handleMouseMove, false);
         // canvas.addEventListener('mousemove', draw, false);
         // canvas.addEventListener('click', handleMouseClick, false);
