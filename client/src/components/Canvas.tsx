@@ -38,14 +38,33 @@ export const Canvas = () => {
     const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
 
     const [canvasCtx, setCanvasCtx] = createSignal(null);
+    const [canvasRect, setCanvasRect] = createSignal(null);
     const [canvasLastMovePoint, setCanvasLastMovePoint] = createSignal(null);
 
+
+    /* instead of drawing rectangles on top of the canvas, we redraw after every submitted action
+    * this allows us to do things like undo, show drawing rectangle, change color, change dimensions, etc. more easily by just manipulating state
+    * */
+    const redrawAllBoxes = () => {
+        const ctx = canvasCtx();
+        const rect = canvasRect();
+        if (!ctx || !rect) return;
+
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        boxes().forEach(box => {
+            ctx.beginPath();
+            ctx.rect(box.startX, box.startY, box.width, box.height);
+            ctx.strokeStyle = "#000000";
+            ctx.stroke();
+        })
+    }
 
     onMount(() => {
         const canvas = document.getElementById<HTMLCanvasElement>(canvasId);
         const rect = canvas.getBoundingClientRect();
         const ctx = canvas?.getContext("2d");
         setCanvasCtx(ctx);
+        setCanvasRect(rect);
         // canvas.style.cursor = "crosshair"y
 
         if (canvas?.getContext) {
@@ -188,18 +207,6 @@ export const Canvas = () => {
             return setFirstPoint(null);
         }
 
-        /* instead of drawing rectangles on top of the canvas, we redraw after every submitted action
-        * this allows us to do things like undo, show drawing rectangle, change color, change dimensions, etc. more easily by just manipulating state
-        * */
-        const redrawAllBoxes = () => {
-            ctx.clearRect(0, 0, rect.width, rect.height);
-            boxes().forEach(box => {
-                ctx.beginPath();
-                ctx.rect(box.startX, box.startY, box.width, box.height);
-                ctx.strokeStyle = "#000000";
-                ctx.stroke();
-            })
-        }
 
         const handleMouseMove = (e: MouseEvent) => {
             if (e.target.id != canvasId) return;
@@ -235,12 +242,20 @@ export const Canvas = () => {
         setBoxes([]);
     }
 
+    const handleUndoButton = () => {
+        if (!canvasCtx()) return;
+
+        setBoxes(p => p.slice(0, p.length - 1))
+        redrawAllBoxes();
+    }
+
     return (
         <>
             <canvas id={canvasId} width={canvasWidth} height={canvasHeight} class={"bg-red-400 relative"} >
                 Image canvas not loaded
             </canvas>
             <button onclick={handleResetButton}>Reset</button>
+            <button onclick={handleUndoButton}>Undo</button>
             {/*<div class={"absolute bg-blue-400 w-48 h-48"}/>*/}
 
         </>
