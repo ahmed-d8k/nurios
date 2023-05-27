@@ -1,0 +1,5 @@
+# Setup
+
+## Server
+
+- Install python

@@ -4,7 +4,7 @@ import {AppCanvas} from "~/components/AppCanvas";
 
 export default function Home() {
     return (
-        <main class="text-center flex flex-col items-center text-gray-700 p-4 bg-neutral-800">
+        <main class="text-center flex flex-col items-center text-gray-700 p-4 bg-neutral-800 min-h-screen">
             <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-4">
                 Capstone
             </h1>
@@ -16,7 +16,7 @@ export default function Home() {
                 <li class={"basic-text"}>- Press Esc to stop drawing</li>
             </ul>
             <AppCanvas/>
-            <p class="my-4 flex gap-2">
+            <p class="my-4 flex gap-2 mt-36">
                 <span>Home</span>
                 <span>{" - "}</span>
                 <A href="/about" class="text-sky-600 hover:underline">

@@ -5,6 +5,7 @@ dist
 .vercel
 .netlify
 netlify
+server/__pycache__
 
 # dependencies
 /node_modules

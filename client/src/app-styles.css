@@ -13,6 +13,19 @@
         @apply text-sm text-neutral-500;
     }
 
+    .canvas {
+        box-shadow: inset 0 0 12px 12px black;
+        max-width: 24rem;
+        overflow: auto;
+        @apply relative shadow-md bg-neutral-700 rounded;
+    }
+
+    .canvas-overlay {
+        z-index: 5;
+        background-color: rgba(36, 36, 36, .75);
+        @apply absolute top-0 left-0 w-full h-full;
+    }
+
     /*.input {*/
     /*    @apply outline-none bg-none;*/
     /*}*/
