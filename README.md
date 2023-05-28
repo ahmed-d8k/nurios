@@ -18,7 +18,7 @@ Git clone the project on your VPS and then run `./start.sh`
 ### SCP
 
 **These commands assume you have Nix installed and are running them from inside the dev environment.**  
-If you don't want to install Nix to deploy, then you can look at the `./server/env.nix` file to see the aliased commands and use them directly.  
+If you don't want to install Nix to deploy, then you can look at `./server/env.nix` to see the aliased commands and use them directly.  
     
 Locally from project root:  
 1. Run `cap:prod:build`
@@ -26,6 +26,6 @@ Locally from project root:
    - You will need to edit `/server/env.nix` to reflect the server IP if it's different
    - This assumes that you have your ssh key in `~/.ssh/cap_key.pem`
   
-On the VPS (home directory):  
+On the VPS from home directory:  
 1. Run `sudo docker load -i ./cap-image.tar;sudo docker run -d -p 80:80 --name cap-container cap`
 2. Test the server by running `curl localhost/ping`
