@@ -17,7 +17,7 @@ Git clone the project on your VPS and then run `./start.sh`
 
 ### SCP
 
-These commands assume you have Nix installed and are running them from inside the dev environment.  
+**These commands assume you have Nix installed and are running them from inside the dev environment.**  
 If you don't want to install Nix to deploy, then you can look at the `./server/env.nix` file to see the aliased commands and use them directly.  
     
 Locally from project root:  
