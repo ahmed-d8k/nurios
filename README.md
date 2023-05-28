@@ -9,7 +9,7 @@ When you start the Nix shell you'll be prompted with a message detailing aliased
 ## Deployment
 
 Currently deployment is done manually. You can deploy via scp or via git, whichever you prefer.  
-The server only really requires Docker. Other configurations (ufw, caddy, users, etc. ) aren't included in this setup.
+The server only really requires Docker. Other configurations (ufw, caddy, users, etc. ) aren't included in this setup guide.
 
 ### Git
 
@@ -18,7 +18,7 @@ Git clone the project on your VPS and then run `./start.sh`
 ### SCP
 
 These commands assume you have Nix installed and are running them from inside the dev environment.  
-If you don't want to install Nix to deploy, then you can look at the `/server/env.nix` file to see the aliased commands and use them directly.  
+If you don't want to install Nix to deploy, then you can look at the `./server/env.nix` file to see the aliased commands and use them directly.  
     
 Locally from project root:  
 1. Run `cap:prod:build`
