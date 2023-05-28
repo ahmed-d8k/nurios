@@ -6,6 +6,7 @@ dist
 .netlify
 netlify
 server/__pycache__
+cap-image.tar*
 
 # dependencies
 /node_modules
