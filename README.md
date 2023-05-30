@@ -1,5 +1,6 @@
 ## Setup
 
+First set the environment variables. You can see the variables to set in `.env.example`. Either set them in a `.env` file or set them in your shell.
 For development, you only need Nix installed (no python, pip, IDE, or anything else required).  
 Once installed, run the shell script in `./env.sh` which will start a Nix shell  
   - Note: If you check the contents of this shell script, it's just running a single command. You can alias this locally if you want.   
