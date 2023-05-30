@@ -4,7 +4,17 @@ from main import app
 
 client = TestClient(app)
 
+
 def test_ping():
     response = client.get("/ping")
     assert response.status_code == 200
     assert response.json() == "pong"
+
+
+def test_process_simplehappy():
+    item = {
+        "intro": "something",
+        "boxes": [1]
+    }
+    response = client.post("/process", json=item)
+    assert response.json() == item

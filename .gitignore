@@ -8,6 +8,7 @@ netlify
 server/__pycache__
 cap-image.tar*
 _build
+venv37
 
 # dependencies
 /node_modules
