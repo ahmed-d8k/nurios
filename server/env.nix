@@ -4,7 +4,7 @@ let
 in
 mkShell {
   name = "pip-env";
-  packages = with python.withPackages; [
+  packages = with python.pkgs; [
     ipython
     pip
     setuptools
@@ -23,6 +23,7 @@ mkShell {
     websockets
     python-dotenv
     aiohttp
+    python-multipart
 
     jetbrains.pycharm-professional
   ];
@@ -37,7 +38,7 @@ mkShell {
     VENV=.venv
     if test ! -d $VENV; then
       virtualenv $VENV
-    fi 
+    fi
     source ./$VENV/bin/activate
     export PYTHONPATH=`pwd`/$VENV/${python.sitePackages}/:$PYTHONPATH
 

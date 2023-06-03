@@ -1,5 +1,5 @@
 from typing import Annotated, List
-from fastapi import FastAPI, WebSocket, HTTPException
+from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from azure.cosmos import PartitionKey
@@ -29,16 +29,16 @@ if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
 
 # async def establish_databases(client):
 
-    # key_path = PartitionKey(path="/categoryId")
-    # new_item = {
-    #     "id": "70b63682-b93a-4c77-aad2-65501347265f",
-    #     "categoryId": "61dba35b-4f02-45c5-b648-c6badc0cbd79",
-    #     "categoryName": "gear-surf-surfboards",
-    #     "name": "Yamba Surfboard",
-    #     "quantity": 12,
-    #     "sale": False,
-    # }
-    # container.create_item(new_item)
+# key_path = PartitionKey(path="/categoryId")
+# new_item = {
+#     "id": "70b63682-b93a-4c77-aad2-65501347265f",
+#     "categoryId": "61dba35b-4f02-45c5-b648-c6badc0cbd79",
+#     "categoryName": "gear-surf-surfboards",
+#     "name": "Yamba Surfboard",
+#     "quantity": 12,
+#     "sale": False,
+# }
+# container.create_item(new_item)
 
 # async def test_create(container):
 #     new_item = {
@@ -59,10 +59,11 @@ if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
 #     # start up
 #     await manage_cosmos(test_create)
 #     yield
-    # clean up
+# clean up
 
 # app = FastAPI(lifespan=lifespan)
 app = FastAPI()
+
 
 # async def get_item(container):
 #     return await container.read_item(
@@ -75,6 +76,7 @@ async def root():
     #     database = await client.create_database_if_not_exists(id=DATABASE_NAME)
     return {"message": "Hello World"}
 
+
 @app.get("/ping")
 async def root():
     return "pong"
@@ -86,9 +88,18 @@ class Box(BaseModel):
     width: int
     height: int
 
+
 class Model(BaseModel):
     intro: str | None = None
     boxes: List[Box] = []
+
+
+@app.post("/file")
+async def upload_file(file: UploadFile):
+    if file.content_type != "image/jpeg":
+        return HTTPException(status_code=422, detail="Bad image format")
+    return {"file_name": file.filename}
+
 
 @app.post("/process")
 async def process(item: Model):
@@ -102,3 +113,5 @@ async def process(item: Model):
 #     while True:
 #         data = await websocket.receive_text()
 #         await websocket.send_text(f"Message text was: {data}")
+
+# TODO: custom exception handlers

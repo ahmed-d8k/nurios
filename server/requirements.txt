@@ -11,3 +11,4 @@ aiohttp
 requests
 pydantic
 azure-cosmos
+python-multipart
