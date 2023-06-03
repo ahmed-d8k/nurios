@@ -1,5 +1,5 @@
 from typing import Annotated, List
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from azure.cosmos import PartitionKey
@@ -93,7 +93,7 @@ class Model(BaseModel):
 @app.post("/process")
 async def process(item: Model):
     if (len(item.boxes) == 0):
-        return
+        raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
 # @app.websocket("/ws")

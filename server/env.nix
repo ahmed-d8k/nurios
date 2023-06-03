@@ -16,7 +16,6 @@ mkShell {
     gcc
     unzip
 
-    jetbrains.pycharm-professional
     fastapi
     uvicorn
     httpx
@@ -24,6 +23,8 @@ mkShell {
     websockets
     python-dotenv
     aiohttp
+
+    jetbrains.pycharm-professional
   ];
   shellHook = ''
     alias cap:dev="uvicorn server.main:app --port 8080 --reload"

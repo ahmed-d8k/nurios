@@ -24,10 +24,12 @@ def test_process_happy_simple():
     response = client.post("/process", json=item)
     assert response.json() == item
 
+
 def test_process_fail_noboxes():
     item = {
         "intro": "something",
         "boxes": []
     }
     response = client.post("/process", json=item)
-    assert response.json() == item
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Need at least one box"
