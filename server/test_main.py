@@ -11,10 +11,23 @@ def test_ping():
     assert response.json() == "pong"
 
 
-def test_process_simplehappy():
+def test_process_happy_simple():
     item = {
         "intro": "something",
-        "boxes": [1]
+        "boxes": [{
+            "x": 5,
+            "y": 10,
+            "width": 25,
+            "height": 20
+        }]
+    }
+    response = client.post("/process", json=item)
+    assert response.json() == item
+
+def test_process_fail_noboxes():
+    item = {
+        "intro": "something",
+        "boxes": []
     }
     response = client.post("/process", json=item)
     assert response.json() == item

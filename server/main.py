@@ -2,8 +2,8 @@ from typing import Annotated, List
 from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
 from dotenv import load_dotenv
-# from azure.cosmos import PartitionKey
-# from azure.cosmos.aio import CosmosClient
+from azure.cosmos import PartitionKey
+from azure.cosmos.aio import CosmosClient
 import os
 import json
 import asyncio
@@ -88,10 +88,12 @@ class Box(BaseModel):
 
 class Model(BaseModel):
     intro: str | None = None
-    boxes: List[Box]
+    boxes: List[Box] = []
 
 @app.post("/process")
 async def process(item: Model):
+    if (len(item.boxes) == 0):
+        return
     return item
 
 # @app.websocket("/ws")
