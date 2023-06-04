@@ -1,6 +1,7 @@
-from typing import Annotated, List
-from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form
-from pydantic import BaseModel
+from typing import Annotated, List, Optional
+from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form, Depends
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel, ValidationError
 from dotenv import load_dotenv
 from starlette import status
 
@@ -91,14 +92,27 @@ class Box(BaseModel):
     width: int
     height: int
 
-
 class Model(BaseModel):
-    intro: str | None = None
+    intro: str
     boxes: List[Box] = []
 
-
+class Base(BaseModel):
+    intro: Optional[str] = None
+    boxes: List[Box]
+def checker(data: str = Form(...)):
+    try:
+        model = Base.parse_raw(data)
+    except ValidationError as e:
+        raise HTTPException(
+            detail=jsonable_encoder(e.errors()),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    return model
 @app.post("/file")
-async def upload_file(file: UploadFile):
+async def upload_file(file: UploadFile,
+                      model: Base = Depends(checker)):
+    if len(model.boxes) < 1:
+        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise HTTPException(status_code=422, detail="Bad image format")
     size = await file.read()
@@ -108,24 +122,14 @@ async def upload_file(file: UploadFile):
             detail="File size is too big. Limit is 15mb"
         )
     await file.seek(0)
+
+
     return {"file_name": file.filename}
-
-    # if max_size:
-    #     size = await file.read()
-    #
-    #     if len(size) > max_size:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-    #             detail="File size is too big. Limit is 5mb"
-    #         )
-    #
-    #     await file.seek(0)
-
 
 @app.post("/process")
 async def process(item: Model):
-    if (len(item.boxes) == 0):
-        raise HTTPException(status_code=404, detail="Need at least one box")
+    # if (len(item.boxes) == 0):
+    #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
 # @app.websocket("/ws")
