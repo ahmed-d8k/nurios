@@ -39,9 +39,10 @@ def test_process_fail_noboxes():
 
 
 @pytest.mark.parametrize("file_path, expected_status_code", [
-    ("./server/test_fixtures/test-image.jpg", 200),
-    ("./server/test_fixtures/test-image.png", 200),
-    ("./server/test_fixtures/test-image.webp", 200),
+    ("./test_fixtures/test-image.jpg", 200),
+    ("./test_fixtures/test-image.png", 200),
+    ("./test_fixtures/test-image.webp", 200),
+    ("./test_fixtures/test-image.html", 422),
 ])
 def test_file_upload_workswithvalidfileformats(file_path, expected_status_code):
     if os.path.isfile(file_path):
@@ -50,6 +51,7 @@ def test_file_upload_workswithvalidfileformats(file_path, expected_status_code):
         assert response.status_code == expected_status_code
     else:
         pytest.fail("Test image doesn't exist")
+
 
 def test_file_upload_empty():
     response = client.post('/file')

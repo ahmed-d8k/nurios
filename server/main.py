@@ -96,9 +96,20 @@ class Model(BaseModel):
 
 @app.post("/file")
 async def upload_file(file: UploadFile):
-    if file.content_type != "image/jpeg":
-        return HTTPException(status_code=422, detail="Bad image format")
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=422, detail="Bad image format")
     return {"file_name": file.filename}
+
+    # if max_size:
+    #     size = await file.read()
+    #
+    #     if len(size) > max_size:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+    #             detail="File size is too big. Limit is 5mb"
+    #         )
+    #
+    #     await file.seek(0)
 
 
 @app.post("/process")
