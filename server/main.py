@@ -2,6 +2,8 @@ from typing import Annotated, List
 from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from starlette import status
+
 from azure.cosmos import PartitionKey
 from azure.cosmos.aio import CosmosClient
 import os
@@ -15,6 +17,7 @@ COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
 COSMOS_KEY = os.getenv("COSMOS_KEY")
 DATABASE_NAME = "cosmicworks"
 CONTAINER_NAME = "products"
+MAX_IMAGE_SIZE_BYTES = 1000000 * 15
 
 if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
     raise Exception("One or more env variables missing")
@@ -98,6 +101,13 @@ class Model(BaseModel):
 async def upload_file(file: UploadFile):
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise HTTPException(status_code=422, detail="Bad image format")
+    size = await file.read()
+    if len(size) > MAX_IMAGE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size is too big. Limit is 15mb"
+        )
+    await file.seek(0)
     return {"file_name": file.filename}
 
     # if max_size:

@@ -2,6 +2,7 @@ import os.path
 
 import pytest
 from fastapi.testclient import TestClient
+from starlette import status
 
 from main import app
 
@@ -56,3 +57,14 @@ def test_file_upload_workswithvalidfileformats(file_path, expected_status_code):
 def test_file_upload_empty():
     response = client.post('/file')
     assert response.status_code == 422
+
+
+def test_fileupload_filetoobig_fails():
+    file_path = "./test_fixtures/test-image-big.png"
+    expected_status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+    if os.path.isfile(file_path):
+        _files = {'file': open(file_path, 'rb')}
+        response = client.post('/file', files=_files)
+        assert response.status_code == expected_status_code
+    else:
+        pytest.fail("Test image doesn't exist")
