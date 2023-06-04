@@ -23,6 +23,14 @@ MAX_IMAGE_SIZE_BYTES = 1000000 * 15
 if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
     raise Exception("One or more env variables missing")
 
+async def get_container():
+    async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
+        database = await client.create_database_if_not_exists(id=DATABASE_NAME)
+        key_path = PartitionKey(path="/categoryId")
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
+        return container.id
+
+
 # async def manage_cosmos(func):
 #     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
 #         database = await client.create_database_if_not_exists(id=DATABASE_NAME)

@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette import status
 
-from main import app
+from main import app, get_container, CONTAINER_NAME
 
 client = TestClient(app)
 
@@ -93,3 +93,8 @@ def test_fileupload_intro_is_optional(intro_msg, worked_expected):
     else:
         pytest.fail("Test image doesn't exist")
 
+
+@pytest.mark.asyncio
+async def test_cosmosutils_getcontainer():
+    container = await get_container()
+    assert container == CONTAINER_NAME

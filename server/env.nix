@@ -20,6 +20,7 @@ mkShell {
     uvicorn
     httpx
     pytest
+    pytest-asyncio
     websockets
     python-dotenv
     aiohttp
