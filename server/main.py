@@ -123,7 +123,6 @@ async def upload_file(file: UploadFile,
         )
     await file.seek(0)
 
-
     return {"file_name": file.filename}
 
 @app.post("/process")

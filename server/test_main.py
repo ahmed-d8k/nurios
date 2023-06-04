@@ -15,9 +15,9 @@ def test_ping():
     assert response.status_code == 200
     assert response.json() == "pong"
 
-def make_box_data():
+def make_box_data(intro_msg: str = 'hello'):
     data = {
-        'intro': 'hello',
+        'intro': intro_msg,
         "boxes": [{
             "x": 5,
             "y": 10,
@@ -58,3 +58,38 @@ def test_fileupload_filetoobig_fails():
         assert response.status_code == expected_status_code
     else:
         pytest.fail("Test image doesn't exist")
+
+def test_fileupload_noboxes_fails():
+    data = {'intro': 'hello', 'boxes': []}
+    file_path = "./test_fixtures/test-image.jpg"
+    if os.path.isfile(file_path):
+        _files = {'file': open(file_path, 'rb')}
+        response = client.post('/file', data=data, files=_files)
+        assert response.status_code != status.HTTP_200_OK
+    else:
+        pytest.fail("Test image doesn't exist")
+
+@pytest.mark.parametrize("intro_msg, worked_expected", [
+    (None, True),
+    ("hello", True),
+])
+def test_fileupload_intro_is_optional(intro_msg, worked_expected):
+    data = {
+        'intro': None,
+        "boxes": [{
+            "x": 5,
+            "y": 10,
+            "width": 25,
+            "height": 20
+        }]
+    }
+    data = {'data': json.dumps(data)}
+    file_path = "./test_fixtures/test-image.jpg"
+    if os.path.isfile(file_path):
+        _files = {'file': open(file_path, 'rb')}
+        response = client.post('/file', data=data, files=_files)
+        did_work = response.status_code == status.HTTP_200_OK
+        assert did_work == worked_expected
+    else:
+        pytest.fail("Test image doesn't exist")
+
