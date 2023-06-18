@@ -38,14 +38,14 @@ def test_file_upload_workswithvalidfileformats(file_path, expected_status_code):
     if os.path.isfile(file_path):
         _files = {'file': open(file_path, 'rb')}
         data = make_box_data()
-        response = client.post('/file', data=data, files=_files)
+        response = client.post('/submit', data=data, files=_files)
         assert response.status_code == expected_status_code
     else:
         pytest.fail("Test image doesn't exist")
 
 def test_file_upload_empty():
     data = make_box_data()
-    response = client.post('/file', data=data)
+    response = client.post('/submit', data=data)
     assert response.status_code == 422
 
 def test_fileupload_filetoobig_fails():
@@ -54,7 +54,7 @@ def test_fileupload_filetoobig_fails():
     expected_status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
     if os.path.isfile(file_path):
         _files = {'file': open(file_path, 'rb')}
-        response = client.post('/file', data=data, files=_files)
+        response = client.post('/submit', data=data, files=_files)
         assert response.status_code == expected_status_code
     else:
         pytest.fail("Test image doesn't exist")
@@ -64,7 +64,7 @@ def test_fileupload_noboxes_fails():
     file_path = "./test_fixtures/test-image.jpg"
     if os.path.isfile(file_path):
         _files = {'file': open(file_path, 'rb')}
-        response = client.post('/file', data=data, files=_files)
+        response = client.post('/submit', data=data, files=_files)
         assert response.status_code != status.HTTP_200_OK
     else:
         pytest.fail("Test image doesn't exist")
@@ -87,7 +87,7 @@ def test_fileupload_intro_is_optional(intro_msg, worked_expected):
     file_path = "./test_fixtures/test-image.jpg"
     if os.path.isfile(file_path):
         _files = {'file': open(file_path, 'rb')}
-        response = client.post('/file', data=data, files=_files)
+        response = client.post('/submit', data=data, files=_files)
         did_work = response.status_code == status.HTTP_200_OK
         assert did_work == worked_expected
     else:

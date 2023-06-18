@@ -19,6 +19,7 @@ COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
 COSMOS_KEY = os.getenv("COSMOS_KEY")
 DATABASE_NAME = "cosmicworks"
 CONTAINER_NAME = "submissions"
+PARTITION_KEY = PartitionKey(path="/id")
 MAX_IMAGE_SIZE_BYTES = 1000000 * 15
 
 if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
@@ -28,16 +29,14 @@ if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
 async def get_container():
     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
-        key_path = PartitionKey(path="/id")
-        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=PARTITION_KEY)
         return container.id
 
 
 async def add_item(data):
     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
-        key_path = PartitionKey(path="/id")
-        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=PARTITION_KEY)
 
         item = {
                    "id": str(uuid.uuid4())
@@ -48,8 +47,7 @@ async def add_item(data):
 async def get_item_by_id(item_id):
     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
-        key_path = PartitionKey(path="/id")
-        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=PARTITION_KEY)
         return await container.read_item(item=item_id, partition_key=item_id)
 
 
@@ -102,7 +100,7 @@ def checker(data: str = Form(...)):
     return model
 
 
-@app.post("/file")
+@app.post("/submit")
 async def upload_file(file: UploadFile,
                       model: Base = Depends(checker)):
     if len(model.boxes) < 1:
