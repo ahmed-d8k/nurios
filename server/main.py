@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated, List, Optional
 from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form, Depends
 from fastapi.encoders import jsonable_encoder
@@ -17,55 +18,41 @@ load_dotenv()
 COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
 COSMOS_KEY = os.getenv("COSMOS_KEY")
 DATABASE_NAME = "cosmicworks"
-CONTAINER_NAME = "products"
+CONTAINER_NAME = "submissions"
 MAX_IMAGE_SIZE_BYTES = 1000000 * 15
 
 if COSMOS_KEY is None or COSMOS_ENDPOINT is None:
     raise Exception("One or more env variables missing")
 
+
 async def get_container():
     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
-        key_path = PartitionKey(path="/categoryId")
+        key_path = PartitionKey(path="/id")
         container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
         return container.id
 
 
-# async def manage_cosmos(func):
-#     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
-#         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
-#         key_path = PartitionKey(path="/categoryId")
-#         container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
-#         print("Loaded databases\t", database.id)
-#         await func(container)
+async def add_item(data):
+    async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
+        database = await client.create_database_if_not_exists(id=DATABASE_NAME)
+        key_path = PartitionKey(path="/id")
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
 
-# async def establish_databases(client):
+        item = {
+                   "id": str(uuid.uuid4())
+               } | data
+        return await container.create_item(body=item)
 
-# key_path = PartitionKey(path="/categoryId")
-# new_item = {
-#     "id": "70b63682-b93a-4c77-aad2-65501347265f",
-#     "categoryId": "61dba35b-4f02-45c5-b648-c6badc0cbd79",
-#     "categoryName": "gear-surf-surfboards",
-#     "name": "Yamba Surfboard",
-#     "quantity": 12,
-#     "sale": False,
-# }
-# container.create_item(new_item)
 
-# async def test_create(container):
-#     new_item = {
-#         "id": "asd",
-#         "categoryId": "qwe",
-#         "categoryName": "gear-surf-surfboards",
-#         "name": "Yamba Surfboard",
-#         "quantity": 12,
-#         "sale": False,
-#     }
-#     await container.create_item(new_item)
-#
+async def get_item_by_id(item_id):
+    async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
+        database = await client.create_database_if_not_exists(id=DATABASE_NAME)
+        key_path = PartitionKey(path="/id")
+        container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=key_path)
+        return await container.read_item(item=item_id, partition_key=item_id)
 
-# async def test_create():
-#     print("working")
+
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
 #     # start up
@@ -77,15 +64,8 @@ async def get_container():
 app = FastAPI()
 
 
-# async def get_item(container):
-#     return await container.read_item(
-#         item="70b63682-b93a-4c77-aad2-65501347265f",
-#         partition_key="61dba35b-4f02-45c5-b648-c6badc0cbd79",
-#     )
 @app.get("/")
 async def root():
-    # async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
-    #     database = await client.create_database_if_not_exists(id=DATABASE_NAME)
     return {"message": "Hello World"}
 
 
@@ -100,13 +80,17 @@ class Box(BaseModel):
     width: int
     height: int
 
+
 class Model(BaseModel):
     intro: str
     boxes: List[Box] = []
 
+
 class Base(BaseModel):
     intro: Optional[str] = None
     boxes: List[Box]
+
+
 def checker(data: str = Form(...)):
     try:
         model = Base.parse_raw(data)
@@ -116,6 +100,8 @@ def checker(data: str = Form(...)):
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     return model
+
+
 @app.post("/file")
 async def upload_file(file: UploadFile,
                       model: Base = Depends(checker)):
@@ -139,6 +125,17 @@ async def process(item: Model):
     #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
+async def download_file():
+    dir_path   = os.path.dirname(os.path.abspath(__file__))
+    output_dir = dir_path + '/files'
+    return output_dir
+
+async def read_file(path):
+    f = open(path, "r")
+    print(f.readline())
+    f.close()
+    
+
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
 #     await websocket.accept()
@@ -147,3 +144,4 @@ async def process(item: Model):
 #         await websocket.send_text(f"Message text was: {data}")
 
 # TODO: custom exception handlers
+# TODO: wrap db connection functions with try/catch

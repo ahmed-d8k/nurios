@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette import status
 
-from main import app, get_container, CONTAINER_NAME
+from main import app, download_file, get_container, CONTAINER_NAME, add_item, get_item_by_id
 
 client = TestClient(app)
 
@@ -98,3 +98,27 @@ def test_fileupload_intro_is_optional(intro_msg, worked_expected):
 async def test_cosmosutils_getcontainer():
     container = await get_container()
     assert container == CONTAINER_NAME
+
+@pytest.mark.asyncio
+async def test_cosmosutils_add_and_get_item():
+    data = {
+        "test_data": "something here"
+    }
+    created_item = await add_item(data)
+    assert created_item is not None
+    assert created_item["id"] is not None
+    assert created_item["test_data"] == "something here"
+
+    fetched_item = await get_item_by_id(created_item["id"])
+    assert fetched_item.get('id') == created_item["id"]
+
+# @pytest.mark.asyncio
+# async def test_cosmosutils_get_item():
+#     item_id = "d3b52752-0f19-40d7-8d16-86f5ef8e44d4"
+#     fetched_item = await get_item_by_id(item_id)
+
+# @pytest.mark.asyncio
+# async def test_download_file():
+    # path = await download_file()
+    # assert path == "asd"
+    # os.path.dirname(os.path.abspath(__file__))
