@@ -1,4 +1,4 @@
-import {createSignal, onMount} from "solid-js";
+import {createSignal, onMount, Show} from "solid-js";
 
 const canvasId = "main-canvas";
 
