@@ -19,7 +19,6 @@ const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
 })
 
 const [firstPoint, setFirstPoint] = createSignal<[number, number] | null>(null)
-const firstPointExists = () => firstPoint() !== null;
 const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
 
 const [canvasCtx, setCanvasCtx] = createSignal<CanvasRenderingContext2D | null>(null);
@@ -34,10 +33,10 @@ const setDrawStyle = () => setStrokeStyle("#000000");
 const setDrawingStyle = () => setStrokeStyle("#FF0800");
 const setupDrawing = () => {
   const canvas = document.querySelector<HTMLCanvasElement>(`#${canvasId}`);
-  const rect = canvas.getBoundingClientRect();
+  const rect = canvas?.getBoundingClientRect();
   const ctx = canvas?.getContext("2d");
-  setCanvasCtx(ctx);
-  setCanvasRect(rect);
+  setCanvasCtx(ctx ?? null);
+  setCanvasRect(rect ?? null);
 
   if (ctx) {
     ctx.fillStyle = "rgb(200, 0, 0)";
@@ -51,6 +50,8 @@ const setupDrawing = () => {
 
   const handleMouseDown = (e: CanvasMouseEvent) => {
     if (e.target.id !== canvasId) return;
+    if (!canvas) return;
+
     const {mouseX, mouseY} = getUsefulDataFromEvent(e);
 
     setFirstPoint([mouseX, mouseY]);
@@ -59,12 +60,16 @@ const setupDrawing = () => {
 
   const handleMouseUp = (e: CanvasMouseEvent) => {
     if (e.target.id !== canvasId) return;
+    if (!canvas) return;
 
     /* this means the user started the click outside the canvas */
-    if (!firstPointExists()) return;
+    if (!firstPoint()) return;
 
     const {mouseX, mouseY} = getUsefulDataFromEvent(e);
-    const [startX, startY] = firstPoint();
+    const [startX, startY] = firstPoint() ?? [];
+
+    /* this should never happen */
+    if (!startX || !startY) return;
 
     const diffX = Math.abs(mouseX - startX);
     const diffY = Math.abs(mouseY - startY);
@@ -85,23 +90,27 @@ const setupDrawing = () => {
 
   const handleMouseMove = (e: CanvasMouseEvent) => {
     if (e.target.id != canvasId) return;
-    if (!firstPointExists()) return;
+    if (!firstPoint()) return;
 
     redrawAllBoxes();
 
     const {mouseX, mouseY} = getUsefulDataFromEvent(e);
-    const [startX, startY] = firstPoint();
+    const [startX, startY] = firstPoint() ?? [];
+
+    /* should never happen */
+    if (!startX || !startY) return;
 
     /* draw a dashed line with set color while dragging, then reset back to original rectangle style */
-    ctx.save();
-    ctx.beginPath();
+    ctx?.save();
+    ctx?.beginPath();
     setDrawingStyle();
-    ctx.setLineDash([6]);
-    ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
-    ctx.restore();
+    ctx?.setLineDash([6]);
+    ctx?.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
+    ctx?.restore();
   }
 
   const handleKeyPress = (e: KeyboardEvent) => {
+    if (!canvas) return console.error("Canvas element not set when executing handleKeyPress");
     if (e.code === "Escape") {
       setFirstPoint(null);
       redrawAllBoxes();
@@ -109,9 +118,9 @@ const setupDrawing = () => {
     }
   }
 
-  canvas.addEventListener("mousemove", handleMouseMove, false);
-  canvas.addEventListener("mousedown", handleMouseDown, false);
-  canvas.addEventListener("mouseup", handleMouseUp, false);
+  canvas?.addEventListener("mousemove", handleMouseMove, false);
+  canvas?.addEventListener("mousedown", handleMouseDown, false);
+  canvas?.addEventListener("mouseup", handleMouseUp, false);
 
   /* keypress doesn't fire when escape is pressed */
   window.addEventListener("keydown", handleKeyPress, false);
@@ -127,6 +136,7 @@ const [fileUploadEle, setFileUploadEle] = createSignal<HTMLInputElement | null>(
 const setupUpload = () => {
   const inputEle = document.querySelector<HTMLInputElement>("#upload-input");
   if (!inputEle) return;
+  console.log("setting up upload");
   setFileUploadEle(inputEle);
 
   const handleImageLoaded = (e) => {
@@ -141,7 +151,7 @@ const setupUpload = () => {
       setImageData({
         width: img.width,
         height: img.height,
-        data: img
+        src: URL.createObjectURL(file)
       });
       ctx.drawImage(img, 0, 0);
     }
@@ -162,7 +172,9 @@ const redrawAllBoxes = () => {
   const ctx = canvasCtx();
   const rect = canvasRect();
   if (!ctx || !rect) return;
-  const {data: imgData} = imageData();
+  const {src: imgData} = imageData();
+
+  if (!imgData) return console.error("imgData was null in redrawAllBoxes");
 
   ctx.clearRect(0, 0, rect.width, rect.height);
   ctx.drawImage(imgData, 0, 0);
@@ -199,7 +211,8 @@ const handleInitialUploadButton = () => {
   if (imageData().src) return;
   if (!fileUploadEle()) return;
 
-  fileUploadEle()?.click()
+  fileUploadEle()?.click();
+  console.log(imageData());
 }
 
 const imageIsStaged = () => !!imageData()?.src;
@@ -211,17 +224,15 @@ export const AppCanvas = () => {
   return (
     <>
       <div class={"flex gap-4 relative"}>
-        <Show when={!imageIsStaged()}>
-          <button
-            onclick={handleInitialUploadButton}
-            class={"canvas-overlay items-center flex justify-center flex-col"}
-          >
-            <p class={"text-neutral-300"}>Choose an image to begin</p>
-            <a class={"text-sky-400"}>
-              Upload
-            </a>
-          </button>
-        </Show>
+        {/*<Show when={!imageData()?.src}>*/}
+        {/*  <button*/}
+        {/*    onclick={handleInitialUploadButton}*/}
+        {/*    class={"canvas-overlay items-center flex justify-center flex-col"}*/}
+        {/*  >*/}
+        {/*    <p class={"text-neutral-300"}>Choose an image to begin</p>*/}
+        {/*    <a class={"text-sky-400"}>Upload</a>*/}
+        {/*  </button>*/}
+        {/*</Show>*/}
         <canvas
           id={canvasId}
           width={imageData().width}
@@ -242,12 +253,12 @@ export const AppCanvas = () => {
             type={"file"}
             accept={"image/*"}
             id={"upload-input"}
-            style={{display: !!imageData().src ? "flex" : "none"}}
+            // style={{display: !!imageData().src ? "flex" : "none"}}
           >
             Change Image
           </input>
         </div>
-        {imageData().src && <div class={"mb-4 mt-2 gap-4 flex"}>
+        {/* imageData().src */ true && <div class={"mb-4 mt-2 gap-4 flex"}>
             <button class="btn-action" onclick={handleResetButton}>Reset</button>
             <button class="btn-action" onclick={handleUndoButton} disabled={boxes().length === 0}>Undo</button>
         </div>}
