@@ -1,8 +1,8 @@
 import {createEffect, createSignal} from "solid-js";
 import {canvasCtx} from "~/components/AppCanvas";
 
-const DEFAULT_DRAWING_COLOR = "#FF0800";
-const DEFAULT_BOX_COLOR = "#000000";
+export const DEFAULT_DRAWING_COLOR = "#FF0800";
+export const DEFAULT_BOX_COLOR = "#000000";
 export const [drawingColor, setDrawingColor] = createSignal<string>(DEFAULT_DRAWING_COLOR);
 export const [boxColor, setBoxColor] = createSignal<string>(DEFAULT_BOX_COLOR);
 
