@@ -26,6 +26,23 @@
         @apply absolute top-0 left-0 w-full h-full;
     }
 
+    .tool-button {
+        border: 1px solid black;
+        border-radius: 4px;
+        @apply w-8 h-8 text-xl text-neutral-500 flex items-center justify-center;
+    }
+
+    .hr {
+        width: calc(100vw - 20rem);
+        @apply my-12;
+    }
+
+    .color-input {
+        /*width: 0px;*/
+        /*height: 0px;*/
+        opacity: 0;
+    }
+
     /*.input {*/
     /*    @apply outline-none bg-none;*/
     /*}*/
