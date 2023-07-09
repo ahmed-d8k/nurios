@@ -27,7 +27,7 @@ const ColorButton = ({id, label, onChange, defaultColor}: {
   defaultColor: string
 }) =>
   (
-    <div class={"flex flex-col"}>
+    <div class={"flex flex-col items-center"}>
       <input
         type="color"
         id={id}
@@ -41,7 +41,7 @@ const ColorButton = ({id, label, onChange, defaultColor}: {
 
 export const ToolBar = () =>
   (
-    <div class={"text-white text-md flex flex-start"}>
+    <div class={"text-white text-md flex flex-start gap-4"}>
       <ColorButton
         id={"drawing-color"}
         label={"Drawing"}
