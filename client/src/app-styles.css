@@ -29,7 +29,9 @@
     .tool-button {
         border: 1px solid black;
         border-radius: 4px;
-        @apply w-8 h-8 text-xl text-neutral-500 flex items-center justify-center;
+        transition: .2s;
+        @apply text-sm p-1 flex flex-col items-center justify-center;
+        @apply hover:text-sky-600;
     }
 
     .color-input {

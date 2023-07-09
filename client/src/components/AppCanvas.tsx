@@ -166,7 +166,7 @@ const redrawAllBoxes = () => {
   })
 }
 
-const handleResetButton = () => {
+export const handleResetButton = () => {
   const ctx = canvasCtx();
   if (!ctx) return;
 
@@ -175,7 +175,7 @@ const handleResetButton = () => {
   setBoxes([]);
 }
 
-const handleUndoButton = () => {
+export const handleUndoButton = () => {
   if (!canvasCtx()) return;
 
   setBoxes(p => p.slice(0, p.length - 1))
@@ -202,12 +202,6 @@ export const AppCanvas = () => {
         >
           Image canvas not loaded
         </canvas>
-      </div>
-      <div class={"flex flex-col items-center"}>
-        <div class={"mb-4 mt-2 gap-4 flex"}>
-          <button class="btn-action" onclick={handleResetButton}>Reset</button>
-          <button class="btn-action" onclick={handleUndoButton} disabled={boxes().length === 0}>Undo</button>
-        </div>
       </div>
     </>
   )
