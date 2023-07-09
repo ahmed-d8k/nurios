@@ -33,15 +33,16 @@ const setupDrawing = () => {
   setCanvasCtx(ctx);
   setCanvasRect(rect);
 
-  if (ctx) {
-    ctx.fillStyle = "rgb(200, 0, 0)";
-    ctx.fillRect(10, 10, 50, 50);
-
-    ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-    ctx.fillRect(30, 30, 50, 50);
-
-    ctx.strokeRect(45, 45, 60, 60);
-  }
+  /* logo drawing */
+  // if (ctx) {
+  //   ctx.fillStyle = "rgb(200, 0, 0)";
+  //   ctx.fillRect(10, 10, 50, 50);
+  //
+  //   ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+  //   ctx.fillRect(30, 30, 50, 50);
+  //
+  //   ctx.strokeRect(45, 45, 60, 60);
+  // }
 
   const handleMouseDown = (e: CanvasMouseEvent) => {
     if (e.target.id !== canvasId) return;
@@ -191,14 +192,17 @@ export const AppCanvas = () => {
 
   return (
     <>
-      <canvas
-        id={canvasId}
-        width={imageData().width}
-        height={imageData().height}
-        class={"relative shadow-md"}
-      >
-        Image canvas not loaded
-      </canvas>
+      <div class={"relative"}>
+        <div class={"absolute image-prompt"}>Upload an image to begin</div>
+        <canvas
+          id={canvasId}
+          width={imageData().width}
+          height={imageData().height}
+          class={"relative shadow-md"}
+        >
+          Image canvas not loaded
+        </canvas>
+      </div>
       <div class={"flex flex-col items-center"}>
         <div class={"mt-4 gap-4 flex w-full text-center"}>
           <input
