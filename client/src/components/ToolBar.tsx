@@ -74,7 +74,7 @@ const ToolBarButton = ({icon, label, onClick}: { icon: JSXElement, label: string
 
 export const ToolBar = () =>
   (
-    <div class={"text-white text-md flex flex-start gap-4 items-start"}>
+    <div class={"text-white text-md flex justify-center gap-4 items-start"}>
       <ColorButton
         id={"drawing-color"}
         label={"Drawing"}

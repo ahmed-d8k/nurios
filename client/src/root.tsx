@@ -11,7 +11,7 @@ import {
   Meta,
   Routes,
   Scripts,
-  Title,
+  Title, Link,
 } from "solid-start";
 import "./app-styles.css";
 
@@ -54,7 +54,7 @@ export default function Root() {
             <Routes>
               <FileRoutes/>
             </Routes>
-            <footer class="mb-4 flex gap-2 w-full justify-center">
+            <footer class="mb-4 mt-8 flex gap-2 w-full justify-center">
               <span>Home</span>
               <span>{" - "}</span>
               <A href="/about" class="text-sky-600 hover:underline">

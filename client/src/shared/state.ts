@@ -13,7 +13,3 @@ const setStrokeStyle = (color: string) => {
 }
 export const applyCanvasBoxColor = (color: string | undefined = boxColor()) => setStrokeStyle(color);
 export const applyCanvasDrawingColor = (color: string | undefined = drawingColor()) => setStrokeStyle(color);
-
-createEffect(() => {
-  console.log("The color is now", drawingColor());
-});
