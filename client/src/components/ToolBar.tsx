@@ -5,6 +5,7 @@ import {
   DEFAULT_BOX_COLOR,
   DEFAULT_DRAWING_COLOR
 } from "~/shared/state";
+import {handleChangeImageButton} from "~/components/AppCanvas";
 
 const ColorIcon = () => {
   return (
@@ -41,7 +42,7 @@ const ColorButton = ({id, label, onChange, defaultColor}: {
 
 export const ToolBar = () =>
   (
-    <div class={"text-white text-md flex flex-start gap-4"}>
+    <div class={"text-white text-md flex flex-start gap-4 items-start"}>
       <ColorButton
         id={"drawing-color"}
         label={"Drawing"}
@@ -54,5 +55,16 @@ export const ToolBar = () =>
         defaultColor={DEFAULT_BOX_COLOR}
         onChange={(e) => setBoxColor(e.target.value)}
       />
+      <div class={"mt-4 gap-4 flex w-full text-center"}>
+        <input
+          class="input"
+          onclick={handleChangeImageButton}
+          type={"file"}
+          accept={"image/*"}
+          id={"upload-input"}
+        >
+          Change Image
+        </input>
+      </div>
     </div>
   )

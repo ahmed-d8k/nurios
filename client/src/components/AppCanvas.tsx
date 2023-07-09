@@ -113,7 +113,7 @@ const setupDrawing = () => {
 }
 
 const defaultImageData = {
-  width: 300,
+  width: 500,
   height: 300,
   imgData: null as HTMLImageElement | null
 };
@@ -182,7 +182,7 @@ const handleUndoButton = () => {
   redrawAllBoxes();
 }
 
-const handleChangeImageButton = () => {
+export const handleChangeImageButton = () => {
   if (!canvasCtx()) return;
 }
 
@@ -192,29 +192,18 @@ export const AppCanvas = () => {
 
   return (
     <>
-      <div class={"relative"}>
+      <div class={"relative flex justify-center"}>
         <div class={"absolute image-prompt"}>Upload an image to begin</div>
         <canvas
           id={canvasId}
           width={imageData().width}
           height={imageData().height}
-          class={"relative shadow-md"}
+          class={"relative rounded-md" + imageData().imgData ? "canvas-shadow-active" : "canvas-shadow-inactive"}
         >
           Image canvas not loaded
         </canvas>
       </div>
       <div class={"flex flex-col items-center"}>
-        <div class={"mt-4 gap-4 flex w-full text-center"}>
-          <input
-            class="input"
-            onclick={handleChangeImageButton}
-            type={"file"}
-            accept={"image/*"}
-            id={"upload-input"}
-          >
-            Change Image
-          </input>
-        </div>
         <div class={"mb-4 mt-2 gap-4 flex"}>
           <button class="btn-action" onclick={handleResetButton}>Reset</button>
           <button class="btn-action" onclick={handleUndoButton} disabled={boxes().length === 0}>Undo</button>
