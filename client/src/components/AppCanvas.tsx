@@ -1,5 +1,5 @@
 import {createSignal, onMount} from "solid-js";
-import {applyCanvasDrawingColor, applyCanvasBoxColor} from "~/shared/state";
+import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/state";
 
 const canvasId = "main-canvas";
 
@@ -8,12 +8,6 @@ type HTMLElementEvent<T extends HTMLElement> = MouseEvent & {
 }
 type CanvasMouseEvent = HTMLElementEvent<HTMLCanvasElement>;
 
-type BoxDrawing = {
-  startX: number,
-  startY: number,
-  width: number,
-  height: number
-};
 const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
   mouseX: e.offsetX,
   mouseY: e.offsetY
@@ -21,7 +15,6 @@ const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
 
 const [firstPoint, setFirstPoint] = createSignal<[number, number] | null>(null)
 const firstPointExists = () => firstPoint() !== null;
-const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
 
 export const [canvasCtx, setCanvasCtx] = createSignal<CanvasRenderingContext2D | null>(null);
 const [canvasRect, setCanvasRect] = createSignal<DOMRect | null>(null);

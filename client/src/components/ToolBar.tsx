@@ -3,7 +3,7 @@ import {
   applyCanvasDrawingColor,
   setBoxColor,
   DEFAULT_BOX_COLOR,
-  DEFAULT_DRAWING_COLOR
+  DEFAULT_DRAWING_COLOR, noBoxesDrawn
 } from "~/shared/state";
 import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/components/AppCanvas";
 import {JSXElement} from "solid-js";
@@ -22,6 +22,16 @@ const ColorIcon = () => {
   );
 }
 
+const SubmitIcon = () => {
+  return (
+    <svg fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="1em"
+         width="1em" style="overflow: visible;">
+      <path
+        d="m1 1.91.78-.41L15 7.449v.95L1.78 14.33 1 13.91 2.583 8 1 1.91ZM3.612 8.5 2.33 13.13 13.5 7.9 2.33 2.839l1.282 4.6L9 7.5v1H3.612Z"></path>
+    </svg>
+  )
+}
+
 const UndoIcon = () => {
   return (
     <svg fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="1em"
@@ -32,9 +42,10 @@ const UndoIcon = () => {
   );
 }
 
-const ResetIcon = ({cls}: {cls: string}) => {
+const ResetIcon = ({cls}: { cls: string }) => {
   return (
-    <svg class={cls} fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="1em"
+    <svg class={cls} fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+         height="1em"
          width="1em" style="overflow: visible;">
       <path d="M12 16c1.671 0 3-1.331 3-3s-1.329-3-3-3-3 1.331-3 3 1.329 3 3 3z"></path>
       <path
@@ -63,11 +74,27 @@ const ColorButton = ({id, label, onChange, defaultColor}: {
     </div>
   )
 
-const ToolBarButton = ({icon, label, onClick}: { icon: JSXElement, label: string, onClick: Function }) => {
+const ToolBarButton = ({icon, label, onClick}: {
+  icon: JSXElement,
+  label: string,
+  onClick: Function
+}) => {
   return (
     <button class={"tool-button cursor-pointer"} onclick={onClick}>
       {icon}
       <label class={"text-neutral-500 hover:text-sky-600 cursor-pointer"}>{label}</label>
+    </button>
+  )
+}
+
+const SubmitButton = () => {
+  return (
+    <button
+      class={"flex items-center gap-2 bg-green-600 disabled:bg-neutral-700 rounded-sm p-2 duration-300"}
+      disabled={noBoxesDrawn()}
+    >
+      <span>Submit</span>
+      <SubmitIcon />
     </button>
   )
 }
@@ -108,5 +135,6 @@ export const ToolBar = () =>
         label={"Reset"}
         onClick={handleResetButton}
       />
+      <SubmitButton />
     </div>
   )

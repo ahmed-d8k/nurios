@@ -1,10 +1,21 @@
-import {createEffect, createSignal} from "solid-js";
+import {createEffect, createMemo, createSignal} from "solid-js";
 import {canvasCtx} from "~/components/AppCanvas";
 
 export const DEFAULT_DRAWING_COLOR = "#FF0800";
 export const DEFAULT_BOX_COLOR = "#000000";
 export const [drawingColor, setDrawingColor] = createSignal<string>(DEFAULT_DRAWING_COLOR);
 export const [boxColor, setBoxColor] = createSignal<string>(DEFAULT_BOX_COLOR);
+
+export interface BoxDrawing {
+  startX: number,
+  startY: number,
+  width: number,
+  height: number
+}
+
+export const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
+
+export const noBoxesDrawn = () => boxes().length === 0;
 
 const setStrokeStyle = (color: string) => {
   const ctx = canvasCtx();
