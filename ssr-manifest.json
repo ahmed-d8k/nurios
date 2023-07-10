@@ -40,22 +40,22 @@
   "src/app-styles.css": [
   ],
   "src/components/AppCanvas.tsx": [
-    "/nurios/assets/index-d803b072.js"
+    "/nurios/assets/index-7119039d.js"
   ],
   "src/components/ToolBar.tsx": [
-    "/nurios/assets/index-d803b072.js"
+    "/nurios/assets/index-7119039d.js"
   ],
   "src/entry-client.tsx": [
   ],
   "src/root.tsx": [
   ],
   "src/routes/[...404].tsx": [
-    "/nurios/assets/_...404_-4abb3a0b.js"
+    "/nurios/assets/_...404_-75e7e581.js"
   ],
   "src/routes/index.tsx": [
-    "/nurios/assets/index-d803b072.js"
+    "/nurios/assets/index-7119039d.js"
   ],
   "src/shared/state.ts": [
-    "/nurios/assets/index-d803b072.js"
+    "/nurios/assets/index-7119039d.js"
   ]
 }
