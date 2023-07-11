@@ -183,6 +183,7 @@ export const AppCanvas = () => {
   onMount(() => setupDrawing());
   onMount(() => setupUpload())
 
+
   return (
     <>
       <div class={"relative flex justify-center"}>

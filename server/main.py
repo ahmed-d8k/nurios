@@ -139,7 +139,7 @@ async def process(item: Model):
     #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
-@app.get("/pinga")
+@app.get("/ping")
 async def ping():
     return {
         "msg": "pong"
