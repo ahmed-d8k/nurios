@@ -5,6 +5,7 @@ export const ErrorMenu = () => {
     <aside class={"error-menu"}>
       <p>Error!</p>
       <p>{lastError()?.msg}</p>
+      {lastError()?.additionalDataStr && <p>{lastError()?.additionalDataStr}</p>}
     </aside>
   )
 }

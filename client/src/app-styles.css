@@ -66,8 +66,9 @@
         border-color: #921111;
         border-style: solid;
         color: white;
+        max-width: 40rem;
 
-        @apply mb-8 py-2;
+        @apply mb-8 py-2 px-4;
     }
 
     .error-menu p:first-child {
