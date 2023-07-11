@@ -1,4 +1,4 @@
-import {DEFAULT_BOX_COLOR, DEFAULT_DRAWING_COLOR, noBoxesDrawn, setBoxColor, setDrawingColor} from "~/shared/state";
+import {DEFAULT_BOX_COLOR, DEFAULT_DRAWING_COLOR, noBoxesDrawn, setBoxColor, setDrawingColor} from "~/shared/drawing-state";
 import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/components/AppCanvas";
 import {createEffect, createResource, createSignal, JSXElement, onMount} from "solid-js";
 import {submit} from "~/shared/resources";
@@ -41,7 +41,7 @@ const SubmitButton = () =>
   (
     <button
       class={"flex items-center gap-2 bg-green-600 disabled:bg-neutral-700 rounded-sm p-2 duration-300"}
-      onclick={_ => submit()}
+      onclick={_ => submit({intro: "hello", boxes: [{x: 0, y: 0, width: 0, height: 0}]})}
       disabled={noBoxesDrawn()}
     >
       <span>Submit</span>

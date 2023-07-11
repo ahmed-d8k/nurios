@@ -1,5 +1,5 @@
 import {createSignal, onMount} from "solid-js";
-import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/state";
+import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
 
 const canvasId = "main-canvas";
 
