@@ -1,6 +1,7 @@
 import {A} from "solid-start";
 import {AppCanvas} from "~/components/AppCanvas";
 import {ToolBar} from "~/components/ToolBar";
+import {ErrorMenu} from "~/components/ErrorMenu";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
             <li class={"basic-text"}>- Press ctrl + Z to undo last box</li>
             <li class={"basic-text"}>- Press Esc to stop drawing</li>
           </ul>
+          <ErrorMenu />
           <ToolBar />
         </div>
         <AppCanvas/>

@@ -58,6 +58,26 @@
         box-shadow: inset 0px 0px 15px 2px rgba(16, 16, 16, .7);
     }
 
+    .error-menu {
+        border-left-width: 5px;
+        border-right-width: 5px;
+        border-bottom-width: 1px;
+        border-top-width: 1px;
+        border-color: #921111;
+        border-style: solid;
+        color: white;
+
+        @apply mb-8 py-2;
+    }
+
+    .error-menu p:first-child {
+        color: red;
+    }
+
+    .error-menu :not(p:first-child) {
+        @apply text-sm;
+    }
+
     /*.input {*/
     /*    @apply outline-none bg-none;*/
     /*}*/

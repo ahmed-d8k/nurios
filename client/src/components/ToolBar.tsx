@@ -3,7 +3,6 @@ import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/co
 import {createEffect, createResource, createSignal, JSXElement, onMount} from "solid-js";
 import {submit} from "~/shared/resources";
 import {ResetIcon, SubmitIcon, UndoIcon} from "~/components/Icons";
-import React from "react";
 
 
 const ColorButton = ({id, label, onChange, defaultColor}: {
