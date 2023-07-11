@@ -13,6 +13,8 @@ import json
 import asyncio
 from contextlib import asynccontextmanager
 
+from starlette.middleware.cors import CORSMiddleware
+
 load_dotenv()
 
 COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
@@ -61,6 +63,20 @@ async def get_item_by_id(item_id):
 # app = FastAPI(lifespan=lifespan)
 app = FastAPI()
 
+origins = [
+    # "http://localhost.tiangolo.com",
+    # "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
@@ -123,6 +139,12 @@ async def process(item: Model):
     #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
+@app.get("/pinga")
+async def ping():
+    return {
+        "msg": "pong"
+    }
+
 async def download_file():
     dir_path   = os.path.dirname(os.path.abspath(__file__))
     output_dir = dir_path + '/files'
@@ -132,7 +154,8 @@ async def read_file(path):
     f = open(path, "r")
     print(f.readline())
     f.close()
-    
+
+
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
