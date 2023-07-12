@@ -13,3 +13,7 @@ pydantic
 azure-cosmos
 python-multipart
 pytest-asyncio
+opencv-python
+numpy
+torch
+torchvision

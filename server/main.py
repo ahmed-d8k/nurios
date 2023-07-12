@@ -1,5 +1,8 @@
 import uuid
 from typing import Annotated, List, Optional
+
+import cv2
+import numpy as np
 from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form, Depends
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ValidationError
@@ -14,6 +17,8 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from starlette.middleware.cors import CORSMiddleware
+
+from server.model.min_sam import BackendSAM
 
 load_dotenv()
 
@@ -121,8 +126,8 @@ def checker(data: str = Form(...)):
 @app.post("/submit")
 async def upload_file(file: UploadFile,
                       model: Base = Depends(checker)):
-    # if len(model.boxes) < 1:
-    #     raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
+    if len(model.boxes) < 1:
+        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise HTTPException(status_code=422, detail="Bad image format")
     size = await file.read()
@@ -133,10 +138,25 @@ async def upload_file(file: UploadFile,
         )
     await file.seek(0)
 
+    transformed_boxes = transform_boxes(model.boxes)
+
+    file_r = await file.read()
+    image_array = np.frombuffer(file_r, np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    input_image = np.asarray(image)
+
+    sam = BackendSAM()
+
+    seg_image, outline_image = sam.process(transformed_boxes, input_image)
+
+    cv2.imwrite("./zxc.jpg", seg_image)
+    cv2.imwrite("./zxc2.jpg", outline_image)
+
     return {
         "file_name": file.filename,
         "intro": model.intro,
-        "boxes": model.boxes
+        "boxes": model.boxes,
+        "transformed_boxes": transformed_boxes,
     }
 
 
@@ -147,10 +167,10 @@ async def process(item: Model):
     return item
 
 
-@app.get("/ping")
+@app.get("/cwd")
 async def ping():
     return {
-        "msg": "pong"
+        "msg": os.getcwd()
     }
 
 
@@ -164,6 +184,40 @@ async def read_file(path):
     f = open(path, "r")
     print(f.readline())
     f.close()
+
+def transform_boxes(boxes):
+    transformed_boxes = []
+    for box in boxes:
+        x1 = box.startX
+        y1 = box.startY
+        x2 = box.startX + box.width
+        y2 = box.startY + box.height
+
+        min_x = 0
+        min_y = 0
+        max_x = 0
+        max_y = 0
+
+        if x1 > x2:
+            max_x = x1
+            min_x = x2
+        else:
+            max_x = x2
+            min_x = x1
+        if y1 > y2:
+            max_y = y1
+            min_y = y2
+        else:
+            max_y = y2
+            min_y = y1
+
+        transformed_boxes.append([
+            min_x,
+            min_y,
+            max_x,
+            max_y
+        ])
+    return transformed_boxes;
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):

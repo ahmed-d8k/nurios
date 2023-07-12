@@ -1,14 +1,12 @@
 import numpy as np
 import torch
-import torchvision
-import matplotlib.pyplot as plt
 import cv2
 from segment_anything import sam_model_registry, SamPredictor
 
 class BackendSAM:
     def __init__(self):
         self.device = "cpu"
-        self.sam_checkpoint = "../fishnet/sam_model/sam_vit_h_4b8939.pth"
+        self.sam_checkpoint = "./server/model/sam_model/sam_vit_h_4b8939.pth"
         self.sam_type = "vit_h"
         self.sam_mask_generator = None
         self.sam = None
@@ -119,7 +117,7 @@ class BackendSAM:
         segment_img = self.resize_img(segment_img, self.orig_h, self.orig_w)
 
         contour = self.generate_advanced_contour_img(id_mask)
-        contour = self.resize_img(contour, self.orig_h, self.orig_w)
+        contour = self.resize_img(contour, self.orig_w, self.orig_h)
         # anti_ctr = self.generate_anti_contour(contour).astype(np.uint8)
         outline_img = prepared_img.astype(np.uint8)
         # outline_img *= anti_ctr

@@ -25,6 +25,10 @@ mkShell {
     python-dotenv
     aiohttp
     python-multipart
+    opencv4
+    numpy
+    torch
+    torchvision
 
     jetbrains.pycharm-professional
   ];
@@ -44,6 +48,7 @@ mkShell {
     export PYTHONPATH=`pwd`/$VENV/${python.sitePackages}/:$PYTHONPATH
 
     pip install --pre azure-cosmos
+    pip install git+https://github.com/facebookresearch/segment-anything.git
 
     echo "Starting python environment.
     See github for this project: https://github.com/ahmed-d8k/nurios
