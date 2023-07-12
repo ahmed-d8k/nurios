@@ -1,4 +1,4 @@
-import wretch from "wretch";
+import wretch, {WretchError} from "wretch";
 import {ErrorHumanMessageEnum, setLastError} from "~/shared/error-state";
 
 interface SubmitResponse {
@@ -18,29 +18,44 @@ interface SAMInputModel {
 }
 
 enum EndpointEnum {
+  Ping = "ping",
   Process = "process"
 }
 
-const baseUrl = "http://localhost:8080"
+const baseUrl = "http://localhost:8080/"
+
+
+const handle422Err = (err: WretchError) => setLastError({
+  msg: ErrorHumanMessageEnum.BadInput,
+  additionalDataStr: err.response.body ? JSON.stringify(err.message) : undefined
+})
+
+const handleGenericErr = (err: WretchError) => setLastError({
+  msg: ErrorHumanMessageEnum.UncaughtError,
+  additionalDataStr: err.response.body ? JSON.stringify(err.message) : undefined
+});
+
+const baseWretch =
+  wretch(baseUrl)
+    .resolve(_ => _.error(422, handle422Err))
 
 export const submit = async (model: SAMInputModel) =>
-  wretch(`${baseUrl}/${EndpointEnum.Process}`)
+  baseWretch
+    .url(EndpointEnum.Process)
     .post(model)
-    .error(422, err => setLastError({
-      msg: ErrorHumanMessageEnum.BadInput,
-      additionalDataStr: err.response.body ? JSON.stringify(err.message) : undefined
-    }))
-    // .res(res => {
-    //   console.log(res);
-    //   console.log("body", res.body.);
-    //   return res.body
-    // })
     .json(res => {
       console.log(res);
       console.log("body", res);
       return res;
     })
+    .catch(handleGenericErr)
+
+export const pingRequest = () => {
+  baseWretch
+    .url(EndpointEnum.Ping)
+    .get()
+    .json(res => res)
     .catch(err => setLastError({
-      msg: ErrorHumanMessageEnum.UncaughtError,
-      additionalDataStr: err.response.body ? JSON.stringify(err.message) : undefined
+      msg: ErrorHumanMessageEnum.ServerDown
     }))
+}

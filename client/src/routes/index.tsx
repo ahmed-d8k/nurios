@@ -3,8 +3,12 @@ import {AppCanvas} from "~/components/AppCanvas";
 import {ToolBar} from "~/components/ToolBar";
 import {ErrorMenu} from "~/components/ErrorMenu";
 import {lastError} from "~/shared/error-state";
+import {pingRequest} from "~/shared/resources";
+import {onMount} from "solid-js";
 
 export default function Home() {
+  onMount(() => pingRequest())
+
   return (
     <div class="text-center flex flex-col items-center flex-auto">
       <main class={"flex flex-col"}>
