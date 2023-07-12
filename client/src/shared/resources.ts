@@ -1,6 +1,8 @@
 import wretch, {WretchError} from "wretch";
 import {ErrorHumanMessageEnum, setLastError} from "~/shared/error-state";
 import {appConfig} from "~/shared/config";
+import {Base} from "@solidjs/meta";
+import {BoxDrawing} from "~/shared/drawing-state";
 
 interface SubmitResponse {
   msg: string;
@@ -13,18 +15,21 @@ interface SAMInputModelBox {
   height: number;
 }
 
-interface SAMInputModel {
+interface SAMSubmitInput {
+  file?: File;
   intro?: string;
-  boxes: SAMInputModelBox[]
+  boxes: BoxDrawing[]
 }
 
 enum EndpointEnum {
-  Ping = "ping",
-  Process = "process"
+  Ping = "ping", /* used to test to make sure server is alive */
+  Process = "process", /* mostly used for testing submit process without file upload */
+  Submit = "submit" /* actual submission endpoint */
 }
 
 
 const mode = import.meta.env.MODE;
+// @ts-ignore
 const baseUrl = appConfig.serverBaseUrl[mode];
 
 const handle422Err = (err: WretchError) => setLastError({
@@ -41,7 +46,7 @@ const baseWretch =
   wretch(baseUrl)
     .resolve(_ => _.error(422, handle422Err))
 
-export const submit = async (model: SAMInputModel) =>
+export const processRequest = async (model: SAMSubmitInput) =>
   baseWretch
     .url(EndpointEnum.Process)
     .post(model)
@@ -51,6 +56,31 @@ export const submit = async (model: SAMInputModel) =>
       return res;
     })
     .catch(handleGenericErr)
+
+export const submitRequest = async (model: SAMSubmitInput) => {
+  try {
+    const url = `${baseUrl}${EndpointEnum.Submit}`;
+
+    const formData = new FormData();
+
+    formData.append("file", model.file)
+    formData.append("data", JSON.stringify({
+      intro: model.intro,
+      boxes: model.boxes
+    }));
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+
+    console.log("response", response);
+  }
+  catch (e){
+    console.log(e)
+  }
+
+}
 
 export const pingRequest = () => {
   baseWretch

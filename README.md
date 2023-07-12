@@ -61,7 +61,6 @@ Locally from project root:
 2. Run `cap:prod:send`
    - You will need to edit `/server/env.nix` to reflect the server IP if it's different
    - This assumes that you have your ssh key in `~/.ssh/cap_key.pem`
-  
 On the VPS from home directory:  
 1. Run `sudo docker load -i ./cap-image.tar`
 2. Run this command, replacing the respective environment variables 

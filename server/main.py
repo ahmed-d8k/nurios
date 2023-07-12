@@ -79,6 +79,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -90,8 +91,8 @@ async def root():
 
 
 class Box(BaseModel):
-    x: int
-    y: int
+    startX: int
+    startY: int
     width: int
     height: int
 
@@ -120,8 +121,8 @@ def checker(data: str = Form(...)):
 @app.post("/submit")
 async def upload_file(file: UploadFile,
                       model: Base = Depends(checker)):
-    if len(model.boxes) < 1:
-        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
+    # if len(model.boxes) < 1:
+    #     raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise HTTPException(status_code=422, detail="Bad image format")
     size = await file.read()
@@ -132,7 +133,12 @@ async def upload_file(file: UploadFile,
         )
     await file.seek(0)
 
-    return {"file_name": file.filename}
+    return {
+        "file_name": file.filename,
+        "intro": model.intro,
+        "boxes": model.boxes
+    }
+
 
 @app.post("/process")
 async def process(item: Model):
@@ -140,23 +146,24 @@ async def process(item: Model):
     #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
 
+
 @app.get("/ping")
 async def ping():
     return {
         "msg": "pong"
     }
 
+
 async def download_file():
-    dir_path   = os.path.dirname(os.path.abspath(__file__))
+    dir_path = os.path.dirname(os.path.abspath(__file__))
     output_dir = dir_path + '/files'
     return output_dir
+
 
 async def read_file(path):
     f = open(path, "r")
     print(f.readline())
     f.close()
-
-
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):

@@ -108,12 +108,13 @@ const setupDrawing = () => {
 const defaultImageData = {
   width: 500,
   height: 300,
-  imgData: null as HTMLImageElement | null
+  imgData: null as HTMLImageElement | null,
+  file: null as string | null
 };
 
-const [imageData, setImageData] = createSignal(defaultImageData);
+export const [imageData, setImageData] = createSignal(defaultImageData);
 const setupUpload = () => {
-  const inputEle = document.querySelector("#upload-input");
+  const inputEle = document.querySelector<HTMLInputElement>("#upload-input");
 
   const handleImageLoaded = (e) => {
     if (e.target.files.length === 0) return;
@@ -127,7 +128,8 @@ const setupUpload = () => {
       setImageData({
         width: img.width,
         height: img.height,
-        imgData: img
+        imgData: img,
+        file: file
       });
       ctx.drawImage(img, 0, 0);
     }
