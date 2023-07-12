@@ -38,57 +38,60 @@
   "node_modules/solid-start/server/types.tsx": [
   ],
   "node_modules/wretch/dist/config.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/constants.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/core.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/index.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/middleware.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/resolver.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "node_modules/wretch/dist/utils.js": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/app-styles.css": [
   ],
   "src/components/AppCanvas.tsx": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/components/ErrorMenu.tsx": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/components/Icons.tsx": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/components/ToolBar.tsx": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/entry-client.tsx": [
   ],
   "src/root.tsx": [
   ],
   "src/routes/[...404].tsx": [
-    "/nurios/assets/_...404_-b1fff960.js"
+    "/nurios/assets/_...404_-4e089a98.js"
   ],
   "src/routes/index.tsx": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
+  ],
+  "src/shared/config.ts": [
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/shared/drawing-state.ts": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/shared/error-state.ts": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ],
   "src/shared/resources.ts": [
-    "/nurios/assets/index-ed234e67.js"
+    "/nurios/assets/index-2d88aa92.js"
   ]
 }
