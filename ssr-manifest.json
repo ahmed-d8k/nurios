@@ -38,60 +38,60 @@
   "node_modules/solid-start/server/types.tsx": [
   ],
   "node_modules/wretch/dist/config.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/constants.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/core.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/index.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/middleware.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/resolver.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "node_modules/wretch/dist/utils.js": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/app-styles.css": [
   ],
   "src/components/AppCanvas.tsx": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/components/ErrorMenu.tsx": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/components/Icons.tsx": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/components/ToolBar.tsx": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/entry-client.tsx": [
   ],
   "src/root.tsx": [
   ],
   "src/routes/[...404].tsx": [
-    "/nurios/assets/_...404_-60606e87.js"
+    "/nurios/assets/_...404_-f93512c1.js"
   ],
   "src/routes/index.tsx": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/shared/config.ts": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/shared/drawing-state.ts": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/shared/error-state.ts": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ],
   "src/shared/resources.ts": [
-    "/nurios/assets/index-bbe5517a.js"
+    "/nurios/assets/index-368a85dd.js"
   ]
 }
