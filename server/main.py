@@ -66,6 +66,7 @@ app = FastAPI()
 origins = [
     # "http://localhost.tiangolo.com",
     # "https://localhost.tiangolo.com",
+    "https://ahmed-d8k.github.io",
     "http://localhost",
     "http://localhost:3000",
 ]

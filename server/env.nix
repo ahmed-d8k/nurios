@@ -30,10 +30,10 @@ mkShell {
   ];
   shellHook = ''
     alias cap:dev="uvicorn server.main:app --port 8080 --reload"
-    alias cap:prod="sudo docker build -t cap .;sudo docker run -d --name cap-container -p 80:80 cap"
+    alias cap:prod="sudo docker build -t cap .;sudo docker run -d --name cap-container -p 8080:8080 cap"
     alias cap:prod:build="sudo docker build -t cap .;sudo docker save -o ./cap-image.tar cap"
     alias cap:prod:send="sudo chmod +r ./cap-image.tar;scp -i ~/.ssh/cap_key.pem -r ./cap-image.tar cap@20.253.238.231:~/cap-image.tar"
-    alias cap:prod:run="sudo docker load -i ./cap-image.tar;sudo docker run -d -p 80:80 --name cap-container cap"
+    alias cap:prod:run="sudo docker load -i ./cap-image.tar;sudo docker run -d -p 8080:8080 --name cap-container cap"
     alias pycharm="pycharm-professional . &>/dev/null &"
 
     VENV=.venv

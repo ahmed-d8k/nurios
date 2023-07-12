@@ -63,5 +63,13 @@ Locally from project root:
    - This assumes that you have your ssh key in `~/.ssh/cap_key.pem`
   
 On the VPS from home directory:  
-1. Run `sudo docker load -i ./cap-image.tar;sudo docker run -d -p 80:80 --name cap-container cap`
-2. Test the server by running `curl localhost/ping`
+1. Run `sudo docker load -i ./cap-image.tar`
+2. Run this command, replacing the respective environment variables 
+```
+sudo docker run -d -p 80:80 \
+-e COSMOS_ENDPOINT=<your endpoint>
+-e COSMOS_KEY=<your key> \
+--name cap-container cap
+```
+  - TODO: improve this process
+3. Test the server by running `curl localhost/ping`
