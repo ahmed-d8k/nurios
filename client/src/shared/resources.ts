@@ -1,5 +1,6 @@
 import wretch, {WretchError} from "wretch";
 import {ErrorHumanMessageEnum, setLastError} from "~/shared/error-state";
+import {appConfig} from "~/shared/config";
 
 interface SubmitResponse {
   msg: string;
@@ -22,8 +23,9 @@ enum EndpointEnum {
   Process = "process"
 }
 
-const baseUrl = "http://localhost:8080/"
 
+const mode = import.meta.env.MODE;
+const baseUrl = appConfig.serverBaseUrl[mode];
 
 const handle422Err = (err: WretchError) => setLastError({
   msg: ErrorHumanMessageEnum.BadInput,
