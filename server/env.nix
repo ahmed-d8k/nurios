@@ -33,7 +33,7 @@ mkShell {
     jetbrains.pycharm-professional
   ];
   shellHook = ''
-    alias cap:dev="uvicorn server.main:app --port 8080 --reload"
+    alias cap:dev="cd server;uvicorn main:app --port 8080 --reload"
     alias cap:prod="sudo docker build -t cap .;sudo docker run -d --name cap-container -p 8080:8080 cap"
     alias cap:prod:build="sudo docker build -t cap .;sudo docker save -o ./cap-image.tar cap"
     alias cap:prod:send="sudo chmod +r ./cap-image.tar;scp -i ~/.ssh/cap_key.pem -r ./cap-image.tar cap@20.253.238.231:~/cap-image.tar"

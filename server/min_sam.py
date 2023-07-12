@@ -6,7 +6,7 @@ from segment_anything import sam_model_registry, SamPredictor
 class BackendSAM:
     def __init__(self):
         self.device = "cpu"
-        self.sam_checkpoint = "./server/model/sam_model/sam_vit_h_4b8939.pth"
+        self.sam_checkpoint = "./sam_vit_h_4b8939.pth"
         self.sam_type = "vit_h"
         self.sam_mask_generator = None
         self.sam = None

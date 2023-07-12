@@ -1,9 +1,9 @@
 import uuid
-from typing import Annotated, List, Optional
+from typing import List, Optional
 
 import cv2
 import numpy as np
-from fastapi import File, FastAPI, WebSocket, HTTPException, UploadFile, Form, Depends
+from fastapi import FastAPI, HTTPException, UploadFile, Form, Depends
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ValidationError
 from dotenv import load_dotenv
@@ -12,13 +12,10 @@ from starlette import status
 from azure.cosmos import PartitionKey
 from azure.cosmos.aio import CosmosClient
 import os
-import json
-import asyncio
-from contextlib import asynccontextmanager
 
 from starlette.middleware.cors import CORSMiddleware
 
-from server.model.min_sam import BackendSAM
+from min_sam import BackendSAM
 
 load_dotenv()
 
@@ -67,6 +64,7 @@ async def get_item_by_id(item_id):
 
 # app = FastAPI(lifespan=lifespan)
 app = FastAPI()
+sam = BackendSAM()
 
 origins = [
     # "http://localhost.tiangolo.com",
@@ -145,8 +143,6 @@ async def upload_file(file: UploadFile,
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     input_image = np.asarray(image)
 
-    sam = BackendSAM()
-
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
 
     cv2.imwrite("./zxc.jpg", seg_image)
@@ -185,6 +181,7 @@ async def read_file(path):
     print(f.readline())
     f.close()
 
+
 def transform_boxes(boxes):
     transformed_boxes = []
     for box in boxes:
@@ -217,7 +214,7 @@ def transform_boxes(boxes):
             max_x,
             max_y
         ])
-    return transformed_boxes;
+    return transformed_boxes
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
