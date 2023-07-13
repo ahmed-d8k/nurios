@@ -114,7 +114,7 @@ class BackendSAM:
         # id_mask = self.resize_img(id_mask, self.orig_h, self.orig_w) doesnt work
 
         segment_img = self.generate_colored_mask(id_mask)
-        segment_img = self.resize_img(segment_img, self.orig_h, self.orig_w)
+        segment_img = self.resize_img(segment_img, self.orig_w, self.orig_h)
 
         contour = self.generate_advanced_contour_img(id_mask)
         contour = self.resize_img(contour, self.orig_w, self.orig_h)

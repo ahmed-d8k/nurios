@@ -255,3 +255,4 @@ def transform_boxes(boxes):
 
 # TODO: custom exception handlers
 # TODO: wrap db connection functions with try/catch
+# TODO: create static folder if not exists
