@@ -127,56 +127,53 @@ class BoxData(BaseModel):
 @app.post("/submit")
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
-async def upload_file(file: bytes = File(...),
+async def upload_file(file: UploadFile = File(...),
                       intro: str = Form(...),
                       box_data: str = Form(...)):
     try:
-        model = Base.parse_raw(box_data)
+        box_input = Base.parse_raw(box_data)
     except pydantic.ValidationError as e:
         raise HTTPException(
             detail=jsonable_encoder(e.errors()),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         ) from e
 
-    if model is None:
+    if box_input is None:
         return {"msg": "bad"}
     if file is None:
         return {"msg": "bad"}
     if intro is None:
         return {"msg": "bad"}
+    if len(box_input.boxes) < 1:
+        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=422, detail="Bad image format")
+    size = await file.read()
+    if len(size) > MAX_IMAGE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size is too big. Limit is 15mb"
+        )
+    await file.seek(0)
+
+    transformed_boxes = transform_boxes(box_input.boxes)
+
+    file_r = await file.read()
+    image_array = np.frombuffer(file_r, np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    input_image = np.asarray(image)
+
+    seg_image, outline_image = sam.process(transformed_boxes, input_image)
+
+    cv2.imwrite("./zxc.jpg", seg_image)
+    cv2.imwrite("./zxc2.jpg", outline_image)
+
     return {
-        "msg": "ok"
+        "file_name": file.filename,
+        "intro": box_input.intro,
+        "boxes": box_input.boxes,
+        "transformed_boxes": transformed_boxes,
     }
-    # if len(model.boxes) < 1:
-    #     raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
-    # if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
-    #     raise HTTPException(status_code=422, detail="Bad image format")
-    # size = await file.read()
-    # if len(size) > MAX_IMAGE_SIZE_BYTES:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-    #         detail="File size is too big. Limit is 15mb"
-    #     )
-    # await file.seek(0)
-    #
-    # transformed_boxes = transform_boxes(model.boxes)
-    #
-    # file_r = await file.read()
-    # image_array = np.frombuffer(file_r, np.uint8)
-    # image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-    # input_image = np.asarray(image)
-    #
-    # seg_image, outline_image = sam.process(transformed_boxes, input_image)
-    #
-    # cv2.imwrite("./zxc.jpg", seg_image)
-    # cv2.imwrite("./zxc2.jpg", outline_image)
-    #
-    # return {
-    #     "file_name": file.filename,
-    #     "intro": model.intro,
-    #     "boxes": model.boxes,
-    #     "transformed_boxes": transformed_boxes,
-    # }
 
 
 @app.post("/process")

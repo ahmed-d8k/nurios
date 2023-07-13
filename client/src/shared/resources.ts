@@ -69,9 +69,7 @@ export const submitRequest = async (model: SAMSubmitInput) => {
     //   boxes: model.boxes
     // }));
     formData.append("box_data", JSON.stringify({
-      boxes: [
-        {startX: 5, startY: 5, width: 100, height: 100}
-      ]
+      boxes: model.boxes
     }));
     formData.append("intro", "hello testing");
 
