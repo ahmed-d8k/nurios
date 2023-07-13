@@ -124,8 +124,8 @@ def checker(data: str = Form(...)):
 @app.post("/submit")
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
-async def upload_file(file: Annotated[UploadFile, File()],
-                      intro: Annotated[str, Form()]):
+async def upload_file(file: UploadFile = File(),
+                      intro: str = Form()):
 
     return {
         "msg": "ok"
