@@ -3,6 +3,7 @@ import {ErrorHumanMessageEnum, setLastError} from "~/shared/error-state";
 import {appConfig} from "~/shared/config";
 import {Base} from "@solidjs/meta";
 import {BoxDrawing} from "~/shared/drawing-state";
+import {setSubmissionLoading, setSubmissionResponseImages} from "~/shared/response-state";
 
 interface SubmitResponse {
   msg: string;
@@ -57,8 +58,14 @@ export const processRequest = async (model: SAMSubmitInput) =>
     })
     .catch(handleGenericErr)
 
+export interface SubmissionResponse {
+  "seg_img_path": string,
+  "outline_img_path": string
+}
 export const submitRequest = async (model: SAMSubmitInput) => {
   try {
+    setSubmissionLoading(true);
+
     const url = `${baseUrl}${EndpointEnum.Submit}`;
 
     const formData = new FormData();
@@ -78,7 +85,14 @@ export const submitRequest = async (model: SAMSubmitInput) => {
       body: formData
     });
 
-    console.log("response", response);
+    const data: SubmissionResponse = await response.json()
+
+    setSubmissionLoading(false);
+    setSubmissionResponseImages({
+      seg: `${baseUrl}${data.seg_img_path}`,
+      outline: `${baseUrl}${data.outline_img_path}`,
+    })
+    console.log("response", data);
   } catch (e) {
     console.log(e)
   }

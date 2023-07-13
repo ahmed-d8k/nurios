@@ -15,6 +15,7 @@ from azure.cosmos.aio import CosmosClient
 import os
 
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from min_sam import BackendSAM
 
@@ -66,6 +67,8 @@ async def get_item_by_id(item_id):
 # app = FastAPI(lifespan=lifespan)
 app = FastAPI()
 sam = BackendSAM()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = [
     # "http://localhost.tiangolo.com",
@@ -165,14 +168,21 @@ async def upload_file(file: UploadFile = File(...),
 
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
 
-    cv2.imwrite("./zxc.jpg", seg_image)
-    cv2.imwrite("./zxc2.jpg", outline_image)
+    img_id = str(uuid.uuid4())
+    seg_img_path = f"static/{img_id}_seg.jpg"
+    outline_img_path = f"static/{img_id}_outline.jpg"
+
+    cv2.imwrite(seg_img_path, seg_image)
+    cv2.imwrite(outline_img_path, outline_image)
 
     return {
         "file_name": file.filename,
         "intro": box_input.intro,
         "boxes": box_input.boxes,
         "transformed_boxes": transformed_boxes,
+        "img_id": img_id,
+        "seg_img_path": seg_img_path,
+        "outline_img_path": outline_img_path
     }
 
 
