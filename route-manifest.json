@@ -2,39 +2,39 @@
   "/*404": [
     {
       "type": "script",
-      "href": "/nurios/assets/_...404_-26b2f72d.js"
+      "href": "/nurios/assets/_...404_-c5761818.js"
     },
     {
       "type": "script",
-      "href": "/nurios/assets/entry-client-17994dfa.js"
+      "href": "/nurios/assets/entry-client-8d9d0ef4.js"
     },
     {
       "type": "style",
-      "href": "/nurios/assets/entry-client-c65c28aa.css"
+      "href": "/nurios/assets/entry-client-2c40ca87.css"
     }
   ],
   "/": [
     {
       "type": "script",
-      "href": "/nurios/assets/index-0c8b8138.js"
+      "href": "/nurios/assets/index-3fac5bd5.js"
     },
     {
       "type": "script",
-      "href": "/nurios/assets/entry-client-17994dfa.js"
+      "href": "/nurios/assets/entry-client-8d9d0ef4.js"
     },
     {
       "type": "style",
-      "href": "/nurios/assets/entry-client-c65c28aa.css"
+      "href": "/nurios/assets/entry-client-2c40ca87.css"
     }
   ],
   "entry-client": [
     {
       "type": "script",
-      "href": "/nurios/assets/entry-client-17994dfa.js"
+      "href": "/nurios/assets/entry-client-8d9d0ef4.js"
     },
     {
       "type": "style",
-      "href": "/nurios/assets/entry-client-c65c28aa.css"
+      "href": "/nurios/assets/entry-client-2c40ca87.css"
     }
   ],
   "index.html": []
