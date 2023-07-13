@@ -3,6 +3,7 @@ from typing import List, Optional, Annotated, Union, Dict
 
 import cv2
 import numpy as np
+import pydantic
 from fastapi import FastAPI, HTTPException, UploadFile, Form, Depends, File
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ValidationError
@@ -120,12 +121,25 @@ def checker(data: str = Form(...)):
         )
     return model
 
+class BoxData(BaseModel):
+    boxes: List[Box]
 
 @app.post("/submit")
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
 async def upload_file(file: bytes = File(...),
-                      intro: str = Form(...)):
+                      intro: str = Form(...),
+                      box_data: str = Form(...)):
+    try:
+        model = Base.parse_raw(box_data)
+    except pydantic.ValidationError as e:
+        raise HTTPException(
+            detail=jsonable_encoder(e.errors()),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+        ) from e
+
+    if model is None:
+        return {"msg": "bad"}
     if file is None:
         return {"msg": "bad"}
     if intro is None:
