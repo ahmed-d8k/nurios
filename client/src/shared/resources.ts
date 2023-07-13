@@ -64,10 +64,11 @@ export const submitRequest = async (model: SAMSubmitInput) => {
     const formData = new FormData();
 
     formData.append("file", model.file)
-    formData.append("data", JSON.stringify({
-      intro: model.intro,
-      boxes: model.boxes
-    }));
+    // formData.append("data", JSON.stringify({
+    //   intro: model.intro,
+    //   boxes: model.boxes
+    // }));
+    formData.append("intro", "hello testing");
 
     const response = await fetch(url, {
       method: 'POST',
