@@ -68,6 +68,11 @@ export const submitRequest = async (model: SAMSubmitInput) => {
     //   intro: model.intro,
     //   boxes: model.boxes
     // }));
+    // formData.append("boxes", JSON.stringify({
+    //   box_data: [
+    //     {startX: 5, startY: 5, width: 100, height: 100}
+    //   ]
+    // }));
     formData.append("intro", "hello testing");
 
     const response = await fetch(url, {
@@ -76,8 +81,7 @@ export const submitRequest = async (model: SAMSubmitInput) => {
     });
 
     console.log("response", response);
-  }
-  catch (e){
+  } catch (e) {
     console.log(e)
   }
 

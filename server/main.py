@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Optional, Annotated
+from typing import List, Optional, Annotated, Union, Dict
 
 import cv2
 import numpy as np
@@ -124,9 +124,12 @@ def checker(data: str = Form(...)):
 @app.post("/submit")
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
-async def upload_file(file: UploadFile = File(),
-                      intro: str = Form()):
-
+async def upload_file(file: bytes = File(...),
+                      intro: str = Form(...)):
+    if file is None:
+        return {"msg": "bad"}
+    if intro is None:
+        return {"msg": "bad"}
     return {
         "msg": "ok"
     }
