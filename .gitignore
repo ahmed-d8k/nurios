@@ -10,6 +10,8 @@ cap-image.tar*
 _build
 venv37
 server/sam_vit_h_4b8939.pth
+server/static/**
+!server/static/.gitkeep
 
 # dependencies
 /node_modules
@@ -20,6 +22,7 @@ server/sam_vit_h_4b8939.pth
 .classpath
 *.launch
 .settings/
+
 
 # Temp
 gitignore
