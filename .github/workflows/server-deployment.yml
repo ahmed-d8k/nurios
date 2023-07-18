@@ -26,5 +26,5 @@ jobs:
             cd ~/cap-git
             git pull
             cd server
-            python3 -m uvicorn --proxy-headers main:app --host 0.0.0.0 --port 8080 &>~/server.log &
+            python3 -m uvicorn --proxy-headers main:app --host 0.0.0.0 --port 8080 &>>~/server.log &
             
