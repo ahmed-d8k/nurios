@@ -20,8 +20,9 @@ jobs:
       - name: Test ssh command
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_USER }}
-          username: ${{ secrets.SSH_HOST }}
-          key: ${{ secrets.PRIVATE_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             touch trying-to-do-something.txt
