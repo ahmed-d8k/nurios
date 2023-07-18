@@ -17,12 +17,14 @@ jobs:
 #        run: |
 #          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_SERVER }} 'touch trying-to-do-something.txt'
 
-      - name: Test ssh command
+      - name: Git pull
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+          target: ./cap-git
           script: |
-            touch trying-to-do-something.txt
+            git pull
+            
