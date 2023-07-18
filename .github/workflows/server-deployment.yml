@@ -22,6 +22,5 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            cd ~/cap-git
-            cd server
+            fuser -k 8080/tcp
             
