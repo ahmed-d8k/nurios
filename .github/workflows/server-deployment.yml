@@ -22,5 +22,5 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            fuser -k 8080/tcp
+            fuser -n tcp -k 8080
             
