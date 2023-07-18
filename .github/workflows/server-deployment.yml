@@ -24,6 +24,5 @@ jobs:
           script: |
             fuser -k 8080/tcp
             cd ~/cap-git
-            git pull
             cd server
             
