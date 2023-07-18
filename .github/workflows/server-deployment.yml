@@ -1,4 +1,4 @@
-name: Deploy server via SSH and Git
+name: Deploy server
 
 on:
   push:
@@ -23,4 +23,7 @@ jobs:
           script_stop: true
           script: |
             fuser -k 8080/tcp &>/dev/null &
-            
+            cd ~/cap-git
+            git pull
+            cd server
+            python3 -m uvicorn --proxy-headers main:app --host 0.0.0.0 --port 8080 &>>~/server.log &
