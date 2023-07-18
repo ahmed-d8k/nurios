@@ -24,7 +24,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          target: ./cap-git
+          script_stop: true
           script: |
+            cd ~/cap-git
             git pull
             
