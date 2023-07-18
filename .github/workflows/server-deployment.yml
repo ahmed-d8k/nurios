@@ -1,4 +1,4 @@
-name: Deploy server
+name: Deploy server via SSH and Git
 
 on:
   push:
@@ -13,11 +13,7 @@ jobs:
       - name: Setup repo on runner
         uses: actions/checkout@v3
 
-#      - name: Test ssh command
-#        run: |
-#          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_SERVER }} 'touch trying-to-do-something.txt'
-
-      - name: Git pull
+      - name: Deploy via git and ssh
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -26,6 +22,9 @@ jobs:
           port: 22
           script_stop: true
           script: |
+            fuser -k 8080/tcp
             cd ~/cap-git
             git pull
+            cd server
+            python3 -m uvicorn --proxy-headers main:app --host 0.0.0.0 --port 8080 &>~/server.log &
             
