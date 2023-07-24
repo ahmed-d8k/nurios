@@ -97,6 +97,9 @@ class BackendSAM:
     def is_in_use(self):
         return self.in_use
 
+    def set_not_in_use(self):
+        self.in_use = False
+
     def get_sam_masks(self, boxes, context_img):
         tensor_boxes = torch.tensor(boxes, device=self.device)
         transformed_boxes = self.sam_predictor.transform.apply_boxes_torch(
@@ -133,7 +136,6 @@ class BackendSAM:
 
         self.output_package["segmentation"] = segment_img
         self.output_package["outline"] = outline_img
-        self.in_use = False
         return segment_img, outline_img
 
     def generate_anti_contour(self, base_contour):
