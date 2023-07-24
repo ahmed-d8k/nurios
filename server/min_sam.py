@@ -5,6 +5,7 @@ from segment_anything import sam_model_registry, SamPredictor
 
 class BackendSAM:
     def __init__(self):
+        self.in_use = False
         self.device = "cpu"
         self.sam_checkpoint = "./sam_vit_h_4b8939.pth"
         self.sam_type = "vit_h"
@@ -93,6 +94,9 @@ class BackendSAM:
     def initialize(self):
         self.init_sam()
 
+    def is_in_user(self):
+        return self.in_use
+
     def get_sam_masks(self, boxes, context_img):
         tensor_boxes = torch.tensor(boxes, device=self.device)
         transformed_boxes = self.sam_predictor.transform.apply_boxes_torch(
@@ -105,10 +109,11 @@ class BackendSAM:
         masks = masks.cpu().numpy()
         return masks
 
-    async def process(self, boxes, img):
+    def process(self, boxes, img):
+        self.in_use = True
         prepared_boxes, prepared_img = self.prepare_boxes_and_img(boxes, img)
-        await self.update_sam_context(prepared_img)
-        sam_masks = await self.get_sam_masks(prepared_boxes, prepared_img)
+        self.update_sam_context(prepared_img)
+        sam_masks = self.get_sam_masks(prepared_boxes, prepared_img)
 
         id_mask =  self.generate_id_mask(prepared_img, sam_masks)
         # id_mask = self.resize_img(id_mask, self.orig_h, self.orig_w) doesnt work
@@ -128,7 +133,7 @@ class BackendSAM:
 
         self.output_package["segmentation"] = segment_img
         self.output_package["outline"] = outline_img
-
+        self.in_use = False
         return segment_img, outline_img
 
     def generate_anti_contour(self, base_contour):
