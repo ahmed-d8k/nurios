@@ -168,6 +168,7 @@ async def upload_file(file: UploadFile = File(...),
     while sam.is_in_use():
         pass
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
+    sam.set_not_in_use()
 
     img_id = str(uuid.uuid4())
     seg_img_path = f"static/{img_id}_seg.jpg"
