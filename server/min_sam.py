@@ -94,7 +94,7 @@ class BackendSAM:
     def initialize(self):
         self.init_sam()
 
-    def is_in_user(self):
+    def is_in_use(self):
         return self.in_use
 
     def get_sam_masks(self, boxes, context_img):
