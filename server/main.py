@@ -165,7 +165,8 @@ async def upload_file(file: UploadFile = File(...),
     image_array = np.frombuffer(file_r, np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     input_image = np.asarray(image)
-
+    while sam.is_in_use():
+        pass
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
 
     img_id = str(uuid.uuid4())
