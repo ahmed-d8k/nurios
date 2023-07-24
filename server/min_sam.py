@@ -105,10 +105,10 @@ class BackendSAM:
         masks = masks.cpu().numpy()
         return masks
 
-    def process(self, boxes, img):
+    async def process(self, boxes, img):
         prepared_boxes, prepared_img = self.prepare_boxes_and_img(boxes, img)
-        self.update_sam_context(prepared_img)
-        sam_masks = self.get_sam_masks(prepared_boxes, prepared_img)
+        await self.update_sam_context(prepared_img)
+        sam_masks = await self.get_sam_masks(prepared_boxes, prepared_img)
 
         id_mask =  self.generate_id_mask(prepared_img, sam_masks)
         # id_mask = self.resize_img(id_mask, self.orig_h, self.orig_w) doesnt work
