@@ -130,65 +130,12 @@ class BoxData(BaseModel):
 @app.post("/submit")
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
-# Original Function
-#async def upload_file(file: UploadFile = File(...),
-#                      intro: str = Form(...),
-#                      box_data: str = Form(...)):
-#    try:
-#        box_input = Base.parse_raw(box_data)
-#    except pydantic.ValidationError as e:
-#        raise HTTPException(
-#            detail=jsonable_encoder(e.errors()),
-#            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-#        ) from e
 
-#    if box_input is None:
-#        return {"msg": "bad"}
-#    if file is None:
-#        return {"msg": "bad"}
-#    if intro is None:
-#        return {"msg": "bad"}
-#    if len(box_input.boxes) < 1:
-#        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
-#    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
-#        raise HTTPException(status_code=422, detail="Bad image format")
-#    size = await file.read()
-#    if len(size) > MAX_IMAGE_SIZE_BYTES:
-#        raise HTTPException(
-#            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-#            detail="File size is too big. Limit is 15mb"
-#        )
- #   await file.seek(0)
+# Imports for making sam proccess synchro
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
-#    transformed_boxes = transform_boxes(box_input.boxes)
-
-#    file_r = await file.read()
-#    image_array = np.frombuffer(file_r, np.uint8)
-#    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-#    input_image = np.asarray(image)
-#    while sam.is_in_use():
-#        pass
-#    seg_image, outline_image = sam.process(transformed_boxes, input_image)
-#    sam.set_not_in_use()
-
-#    img_id = str(uuid.uuid4())
-#    seg_img_path = f"static/{img_id}_seg.jpg"
-#    outline_img_path = f"static/{img_id}_outline.jpg"
-
-#    cv2.imwrite(seg_img_path, seg_image)
-#    cv2.imwrite(outline_img_path, outline_image)
-
-#    return {
-#        "file_name": file.filename,
-#        "intro": box_input.intro,
-#        "boxes": box_input.boxes,
-#        "transformed_boxes": transformed_boxes,
-#        "img_id": img_id,
-#        "seg_img_path": seg_img_path,
-#        "outline_img_path": outline_img_path
-#    }
-
-def upload_file(file: UploadFile = File(...),
+async def upload_file(file: UploadFile = File(...),
                       intro: str = Form(...),
                       box_data: str = Form(...)):
     try:
@@ -209,23 +156,28 @@ def upload_file(file: UploadFile = File(...),
         raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise HTTPException(status_code=422, detail="Bad image format")
-    size = file.read()
+    size = await file.read()
     if len(size) > MAX_IMAGE_SIZE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail="File size is too big. Limit is 15mb"
         )
-    file.seek(0)
+    await file.seek(0)
 
     transformed_boxes = transform_boxes(box_input.boxes)
 
-    file_r = file.read()
+    file_r = await file.read()
     image_array = np.frombuffer(file_r, np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     input_image = np.asarray(image)
+
     while sam.is_in_use():
         pass
-    seg_image, outline_image = sam.process(transformed_boxes, input_image)
+    seg_image = None
+    outline_image = None
+    with ThreadPoolExecutor() as executor:
+        # seg_image, outline_image = await sam.process(transformed_boxes, input_image)
+        seg_image, outline_image = await asyncio.get_event_loop().run_in_executor(executor, sam.process, transformed_boxes, input_image)
     sam.set_not_in_use()
 
     img_id = str(uuid.uuid4())
