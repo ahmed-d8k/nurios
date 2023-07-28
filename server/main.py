@@ -131,8 +131,7 @@ class BoxData(BaseModel):
 # async def upload_file(file: UploadFile,
 #                       model: Base = Depends(checker)):
 
-# Temp important while troubleshooting
-import time
+
 
 async def upload_file(file: UploadFile = File(...),
                       intro: str = Form(...),
@@ -172,8 +171,6 @@ async def upload_file(file: UploadFile = File(...),
 
     while sam.is_in_use():
         pass
-    else:
-        time.sleep(5)
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
     sam.set_not_in_use()
 
