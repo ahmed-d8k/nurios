@@ -132,9 +132,6 @@ class BoxData(BaseModel):
 #                       model: Base = Depends(checker)):
 
 # Imports for making sam proccess synchro
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-
 async def upload_file(file: UploadFile = File(...),
                       intro: str = Form(...),
                       box_data: str = Form(...)):
@@ -175,9 +172,7 @@ async def upload_file(file: UploadFile = File(...),
         pass
     seg_image = None
     outline_image = None
-    with ThreadPoolExecutor() as executor:
-        # seg_image, outline_image = await sam.process(transformed_boxes, input_image)
-        seg_image, outline_image = await asyncio.get_event_loop().run_in_executor(executor, sam.process, transformed_boxes, input_image)
+    seg_image, outline_image = await sam.process(transformed_boxes, input_image)
     sam.set_not_in_use()
 
     img_id = str(uuid.uuid4())
