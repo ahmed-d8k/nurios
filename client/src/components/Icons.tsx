@@ -1,8 +1,10 @@
-export const ColorIcon = () => {
+import {JSX} from "solid-js/h/jsx-runtime";
+
+export const ColorIcon = (props: {style?: JSX.CSSProperties | undefined | string}) => {
   return (
-    <svg fill="none" stroke-width="2" xmlns="http://www.w3.org/2000/svg"
-         class="icon icon-tabler icon-tabler-color-filter" width="1em" height="1em" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="overflow: visible;">
+    <svg style={props.style} fill="none" stroke-width="2" xmlns="http://www.w3.org/2000/svg"
+         class="icon icon-tabler icon-tabler-color-filter text-lg" width="1em" height="1em" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path
         d="M13.58 13.79c.27 .68 .42 1.43 .42 2.21c0 1.77 -.77 3.37 -2 4.46a5.93 5.93 0 0 1 -4 1.54c-3.31 0 -6 -2.69 -6 -6c0 -2.76 1.88 -5.1 4.42 -5.79"></path>
@@ -54,4 +56,14 @@ export const CheckIcon = () => {
     </svg>
   );
 
+}
+
+export const UploadIcon = () => {
+  return (
+    <svg fill="currentColor" class="text-xl" stroke-width="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" height="1em"
+         width="1em" style="overflow: visible;">
+      <path
+        d="M400 317.7h73.9V656c0 4.4 3.6 8 8 8h60c4.4 0 8-3.6 8-8V317.7H624c6.7 0 10.4-7.7 6.3-12.9L518.3 163a8 8 0 0 0-12.6 0l-112 141.7c-4.1 5.3-.4 13 6.3 13zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z"></path>
+    </svg>
+  );
 }

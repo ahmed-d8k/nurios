@@ -1,5 +1,5 @@
 import {
-  ImageSelectionOption, resetResponseState,
+  ImageSelectionOption, inferSelectedImage, resetResponseState,
   selectedImage,
   setSelectedImage,
   submissionLoading,
@@ -70,8 +70,11 @@ const ImagesModalContent = () => {
           </button>
         </div>
       </div>
-      <img class="display-image"
-           src={selectedImage() === ImageSelectionOption.Seg ? submissionResponseImages()?.seg : submissionResponseImages()?.outline}/>
+      <img
+        alt={"Selected image"}
+        class="display-image"
+        src={inferSelectedImage()}
+      />
     </div>
   )
 }

@@ -1,5 +1,6 @@
-import {createSignal, onMount} from "solid-js";
+import {createSignal, onMount, Show} from "solid-js";
 import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
+import {uploadedImageData, setUploadedImageData} from "~/shared/upload-state";
 
 const canvasId = "main-canvas";
 
@@ -95,6 +96,9 @@ const setupDrawing = () => {
       redrawAllBoxes();
       canvas.style.cursor = "default";
     }
+    if (e.ctrlKey && e.key === "z") {
+      handleUndoButton()
+    }
   }
 
   canvas.addEventListener("mousemove", handleMouseMove, false);
@@ -105,18 +109,10 @@ const setupDrawing = () => {
   window.addEventListener("keydown", handleKeyPress, false);
 }
 
-const defaultImageData = {
-  width: 500,
-  height: 300,
-  imgData: null as HTMLImageElement | null,
-  file: null as string | null
-};
-
-export const [imageData, setImageData] = createSignal(defaultImageData);
 const setupUpload = () => {
   const inputEle = document.querySelector<HTMLInputElement>("#upload-input");
 
-  const handleImageLoaded = (e) => {
+  const handleImageUploadSelected = (e) => {
     if (e.target.files.length === 0) return;
     const ctx = canvasCtx();
     if (!ctx) return;
@@ -125,7 +121,7 @@ const setupUpload = () => {
 
     const img = new Image();
     img.onload = () => {
-      setImageData({
+      setUploadedImageData({
         width: img.width,
         height: img.height,
         imgData: img,
@@ -136,7 +132,7 @@ const setupUpload = () => {
     img.src = URL.createObjectURL(file);
   }
 
-  inputEle.addEventListener("change", handleImageLoaded)
+  inputEle?.addEventListener("change", handleImageUploadSelected)
   /* TODO: handle err */
 }
 
@@ -147,7 +143,7 @@ const redrawAllBoxes = () => {
   const ctx = canvasCtx();
   const rect = canvasRect();
   if (!ctx || !rect) return;
-  const {imgData} = imageData();
+  const {imgData} = uploadedImageData();
 
   if (!imgData) return console.error("no image data in redrawAllBoxes")
 
@@ -189,12 +185,14 @@ export const AppCanvas = () => {
   return (
     <>
       <div class={"relative flex justify-center"}>
-        <div class={"absolute image-prompt"}>Upload an image to begin</div>
+        <Show when={!uploadedImageData().file}>
+          <div class={"absolute image-prompt z-10"}>Upload an image to begin</div>
+        </Show>
         <canvas
           id={canvasId}
-          width={imageData().width}
-          height={imageData().height}
-          class={"relative rounded-md" + imageData().imgData ? "canvas-shadow-active" : "canvas-shadow-inactive"}
+          width={uploadedImageData().width}
+          height={uploadedImageData().height}
+          class={"canvas " + uploadedImageData().imgData ? "canvas-shadow-active" : "canvas-shadow-inactive"}
         >
           Image canvas not loaded
         </canvas>

@@ -30,8 +30,18 @@
         border: 1px solid black;
         border-radius: 4px;
         transition: .2s;
-        @apply text-sm p-1 flex flex-col items-center justify-center;
+        height: 3.5rem;
+        background-color: rgb(40, 40, 40);
+        @apply text-sm flex flex-col gap-1 items-center justify-center;
         @apply hover:text-sky-600;
+    }
+
+    .tool-button.flexible {
+        @apply px-1;
+    }
+
+    .tool-button:not(.flexible) {
+        width: 3.75rem;
     }
 
     .color-input {
@@ -148,6 +158,11 @@
 
     .done-button svg {
         @apply text-xl;
+    }
+
+    #main-canvas {
+        background-color: rgb(33, 33, 33);
+        @apply relative rounded-md;
     }
     /*.input {*/
     /*    @apply outline-none bg-none;*/
