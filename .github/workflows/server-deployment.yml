@@ -1,0 +1,29 @@
+name: Deploy server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup repo on runner
+        uses: actions/checkout@v3
+
+      - name: Deploy via git and ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            fuser -k 8080/tcp &>/dev/null &
+            cd ~/cap-git
+            git pull
+            cd server
+            python3 -m uvicorn --proxy-headers main:app --host 0.0.0.0 --port 8080 &>>~/server.log &

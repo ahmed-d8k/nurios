@@ -162,7 +162,10 @@ async def upload_file(file: UploadFile = File(...),
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     input_image = np.asarray(image)
 
+    while sam.is_in_use():
+        pass
     seg_image, outline_image = sam.process(transformed_boxes, input_image)
+    sam.set_not_in_use()
 
     img_id = str(uuid.uuid4())
     seg_img_path = f"static/{img_id}_seg.jpg"
@@ -180,7 +183,6 @@ async def upload_file(file: UploadFile = File(...),
         "seg_img_path": seg_img_path,
         "outline_img_path": outline_img_path
     }
-
 
 @app.post("/process")
 async def process(item: Model):
