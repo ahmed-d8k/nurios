@@ -50,7 +50,7 @@ async def add_item(data):
         return await container.create_item(body=item)
 
 
-async def get_item_by_id(item_id):
+async def get_item_by_id(item_id: str):
     async with CosmosClient(url=COSMOS_ENDPOINT, credential=COSMOS_KEY) as client:
         database = await client.create_database_if_not_exists(id=DATABASE_NAME)
         container = await database.create_container_if_not_exists(id=CONTAINER_NAME, partition_key=PARTITION_KEY)
@@ -71,8 +71,6 @@ sam = BackendSAM()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = [
-    # "http://localhost.tiangolo.com",
-    # "https://localhost.tiangolo.com",
     "https://ahmed-d8k.github.io",
     "http://localhost",
     "http://localhost:3000",
@@ -128,11 +126,6 @@ class BoxData(BaseModel):
     boxes: List[Box]
 
 @app.post("/submit")
-# async def upload_file(file: UploadFile,
-#                       model: Base = Depends(checker)):
-
-
-
 async def upload_file(file: UploadFile = File(...),
                       intro: str = Form(...),
                       box_data: str = Form(...)):
@@ -196,13 +189,6 @@ async def process(item: Model):
     # if (len(item.boxes) == 0):
     #     raise HTTPException(status_code=404, detail="Need at least one box")
     return item
-
-
-@app.get("/cwd")
-async def ping():
-    return {
-        "msg": os.getcwd()
-    }
 
 
 async def download_file():
