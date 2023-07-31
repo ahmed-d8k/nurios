@@ -1,3 +1,5 @@
+import asyncio
+import time
 import uuid
 from typing import List, Optional, Annotated, Union, Dict
 
@@ -16,6 +18,7 @@ import os
 
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
+from starlette.websockets import WebSocket
 
 from min_sam import BackendSAM
 
@@ -122,8 +125,10 @@ def checker(data: str = Form(...)):
         )
     return model
 
+
 class BoxData(BaseModel):
     boxes: List[Box]
+
 
 @app.post("/submit")
 async def upload_file(file: UploadFile = File(...),
@@ -184,6 +189,7 @@ async def upload_file(file: UploadFile = File(...),
         "outline_img_path": outline_img_path
     }
 
+
 @app.post("/process")
 async def process(item: Model):
     # if (len(item.boxes) == 0):
@@ -206,43 +212,27 @@ async def read_file(path):
 def transform_boxes(boxes):
     transformed_boxes = []
     for box in boxes:
-        x1 = box.startX
-        y1 = box.startY
-        x2 = box.startX + box.width
-        y2 = box.startY + box.height
+        x1, y1 = box.startX, box.startY
+        x2, y2 = x1 + box.width, y1 + box.height
 
-        min_x = 0
-        min_y = 0
-        max_x = 0
-        max_y = 0
+        min_x, max_x = min(x1, x2), max(x1, x2)
+        min_y, max_y = min(y1, y2), max(y1, y2)
 
-        if x1 > x2:
-            max_x = x1
-            min_x = x2
-        else:
-            max_x = x2
-            min_x = x1
-        if y1 > y2:
-            max_y = y1
-            min_y = y2
-        else:
-            max_y = y2
-            min_y = y1
+        transformed_boxes.append([min_x, min_y, max_x, max_y])
 
-        transformed_boxes.append([
-            min_x,
-            min_y,
-            max_x,
-            max_y
-        ])
     return transformed_boxes
 
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     while True:
-#         data = await websocket.receive_text()
-#         await websocket.send_text(f"Message text was: {data}")
+
+async def every_5_second_task(ws: WebSocket):
+    while True:
+        await ws.send_text(f"hello")
+        await asyncio.sleep(5)
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    await asyncio.create_task(every_5_second_task(websocket))
 
 # TODO: custom exception handlers
 # TODO: wrap db connection functions with try/catch

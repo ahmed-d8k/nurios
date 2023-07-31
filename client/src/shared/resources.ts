@@ -4,6 +4,7 @@ import {appConfig} from "~/shared/config";
 import {Base} from "@solidjs/meta";
 import {BoxDrawing} from "~/shared/drawing-state";
 import {setSubmissionLoading, setSubmissionResponseImages} from "~/shared/response-state";
+import {onMount} from "solid-js";
 
 interface SubmitResponse {
   msg: string;
@@ -62,39 +63,50 @@ export interface SubmissionResponse {
   "seg_img_path": string,
   "outline_img_path": string
 }
+
+
+let ws: WebSocket | undefined;
 export const submitRequest = async (model: SAMSubmitInput) => {
   try {
-    setSubmissionLoading(true);
-
-    const url = `${baseUrl}${EndpointEnum.Submit}`;
-
-    const formData = new FormData();
-
-    formData.append("file", model.file)
-    // formData.append("data", JSON.stringify({
-    //   intro: model.intro,
+    // setSubmissionLoading(true);
+    //
+    // const url = `${baseUrl}${EndpointEnum.Submit}`;
+    //
+    // const formData = new FormData();
+    //
+    // formData.append("file", model.file)
+    // formData.append("box_data", JSON.stringify({
     //   boxes: model.boxes
     // }));
-    formData.append("box_data", JSON.stringify({
-      boxes: model.boxes
-    }));
-    formData.append("intro", "hello testing");
+    // formData.append("intro", "hello testing");
+    //
+    // const response = await fetch(url, {
+    //   method: 'POST',
+    //   body: formData
+    // });
+    //
+    // const data: SubmissionResponse = await response.json()
 
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData
-    });
+    ws = new WebSocket("ws://localhost:8080/ws");
+    ws.onmessage = (event) => {
+      console.log("event came in through ws", event);
+    };
 
-    const data: SubmissionResponse = await response.json()
+    // const sendMessage = (event) => {
+    //   const input = document.getElementById("messageText");
+    //   ws?.send(input?.value)
+    //   input.value = ''
+    //   event.preventDefault();
+    // }
 
-    setSubmissionLoading(false);
-    setSubmissionResponseImages({
-      seg: `${baseUrl}${data.seg_img_path}`,
-      outline: `${baseUrl}${data.outline_img_path}`,
-    })
-    console.log("response", data);
+    // setSubmissionLoading(false);
+    // setSubmissionResponseImages({
+    //   seg: `${baseUrl}${data.seg_img_path}`,
+    //   outline: `${baseUrl}${data.outline_img_path}`,
+    // })
+    // console.log("response", data);
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 
 }
