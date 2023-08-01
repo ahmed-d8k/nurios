@@ -1,6 +1,6 @@
 import {createSignal, onMount, Show} from "solid-js";
 import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
-import {uploadedImageData, setUploadedImageData} from "~/shared/upload-state";
+import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded} from "~/shared/upload-state";
 
 const canvasId = "main-canvas";
 
@@ -40,6 +40,7 @@ const setupDrawing = () => {
 
   const handleMouseDown = (e: CanvasMouseEvent) => {
     if (e.target.id !== canvasId) return;
+    if (!uploadedImageData().imgData) return;
     const {mouseX, mouseY} = getUsefulDataFromEvent(e);
 
     setFirstPoint([mouseX, mouseY]);
