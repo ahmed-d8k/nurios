@@ -8,5 +8,6 @@ const defaultImageData = {
   file: null as string | null
 };
 export const [uploadedImageData, setUploadedImageData] = createSignal(defaultImageData);
+export const resetImageData = () => setUploadedImageData(defaultImageData);
 
 export const imageHasBeenUploaded = () => !!uploadedImageData().imgData

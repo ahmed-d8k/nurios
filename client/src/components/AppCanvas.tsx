@@ -1,6 +1,6 @@
 import {createSignal, onMount, Show} from "solid-js";
 import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
-import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded} from "~/shared/upload-state";
+import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded, resetImageData} from "~/shared/upload-state";
 
 const canvasId = "main-canvas";
 
@@ -165,6 +165,7 @@ export const handleResetButton = () => {
   // @ts-ignore
   ctx.reset();
   setBoxes([]);
+  resetImageData();
 }
 
 export const handleUndoButton = () => {
