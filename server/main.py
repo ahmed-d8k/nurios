@@ -74,7 +74,7 @@ class QueueDataStore:
         return item in self.queue
 
     def pos_in_queue(self, item):
-        return self.queue.index(item) + 1
+        return self.queue.index(item)
 
     def remove_item(self, item):
         self.queue.remove(item)
@@ -130,7 +130,6 @@ class Box:
     startY: int
     width: int
     height: int
-
 
 
 class Model(BaseModel):
@@ -301,8 +300,10 @@ async def websocket_endpoint(websocket: WebSocket,
     # read from file system and then
     file_r = cv2.imread(og_img_path)
 
-    seg_image, outline_image = sam.process(transformed_boxes, file_r)
-    #
+    # seg_image, outline_image = sam.process(transformed_boxes, file_r)
+    loop = asyncio.get_event_loop()
+    seg_image, outline_image = await loop.run_in_executor(None, lambda: sam.process(transformed_boxes, file_r))
+
     cv2.imwrite(seg_img_path, seg_image)
     cv2.imwrite(outline_img_path, outline_image)
 
@@ -324,13 +325,12 @@ def transform_boxes(boxes):
     return transformed_boxes
 
 
-
 async def wait_for_queue(ws: WebSocket,
                          queue_id: str,
                          queue_store: QueueDataStore):
     while True:
         pos = queue_store.pos_in_queue(queue_id)
-        if pos == 1:
+        if pos == 0:
             return True
 
         await ws.send_text(pos.__str__())
