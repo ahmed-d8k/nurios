@@ -73,6 +73,12 @@ class QueueDataStore:
     def item_exists(self, item):
         return item in self.queue
 
+    def pos_in_queue(self, item):
+        return self.queue.index(item) + 1
+
+    def remove_item(self, item):
+        self.queue.remove(item)
+
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
@@ -246,14 +252,19 @@ async def process_endpoint(file: UploadFile = File(...),
     transformed_boxes = transform_boxes(box_input.boxes)
     queue_id = str(uuid.uuid4())
 
-    img_path = f"static/{queue_id}_og.jpg"
-    with open(img_path, "wb") as f:
+    og_img_path = f"static/{queue_id}_og.jpg"
+    seg_img_path = f"static/{queue_id}_seg.jpg"
+    outline_img_path = f"static/{queue_id}_outline.jpg"
+    with open(og_img_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
     data = {
         "id": queue_id,
         "input_boxes": [asdict(box) for box in box_input.boxes],
         "transformed_boxes": transformed_boxes,
+        "og_img_path": og_img_path,
+        "seg_img_path": seg_img_path,
+        "outline_img_path": outline_img_path
     }
     queue_store.add_item(queue_id)
     await add_item(data)
@@ -275,10 +286,28 @@ async def websocket_endpoint(websocket: WebSocket,
         return await websocket.close()
 
     await websocket.accept()
-    await wait_for_queue(websocket, queue_id)
-    await websocket.close()
-    # await websocket.accept()
-    # await asyncio.create_task(every_5_second_task(websocket))
+    await wait_for_queue(websocket, queue_id, queue_store)
+
+    await websocket.send_text("processing")
+
+    og_img_path = f"static/{queue_id}_og.jpg"
+    seg_img_path = f"static/{queue_id}_seg.jpg"
+    outline_img_path = f"static/{queue_id}_outline.jpg"
+
+    # query to find the transformed boxes from database
+    db_item = await get_item_by_id(queue_id)
+    transformed_boxes = db_item.get("transformed_boxes")
+
+    # read from file system and then
+    file_r = cv2.imread(og_img_path)
+
+    seg_image, outline_image = sam.process(transformed_boxes, file_r)
+    #
+    cv2.imwrite(seg_img_path, seg_image)
+    cv2.imwrite(outline_img_path, outline_image)
+
+    await websocket.send_text("complete")
+    queue_store.remove_item(queue_id)
 
 
 def transform_boxes(boxes):
@@ -295,11 +324,17 @@ def transform_boxes(boxes):
     return transformed_boxes
 
 
-async def wait_for_queue(ws: WebSocket, queue_id: str):
-    while True:
 
-        await ws.send_text(queue_id)
-        # await asyncio.sleep(5)
+async def wait_for_queue(ws: WebSocket,
+                         queue_id: str,
+                         queue_store: QueueDataStore):
+    while True:
+        pos = queue_store.pos_in_queue(queue_id)
+        if pos == 1:
+            return True
+
+        await ws.send_text(pos.__str__())
+        await asyncio.sleep(5)
 
 # TODO: custom exception handlers
 # TODO: wrap db connection functions with try/catch

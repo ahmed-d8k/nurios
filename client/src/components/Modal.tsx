@@ -1,48 +1,69 @@
 import {
-  ImageSelectionOption, inferSelectedImage, resetResponseState,
+  ImageSelectionOption,
+  inferSelectedImage,
+  queuePosition,
+  resetResponseState,
   selectedImage,
   setSelectedImage,
-  submissionLoading,
-  submissionResponseImages
+  submissionResponseImages,
+  submissionStatus,
+  SubmissionStatusEnum
 } from "~/shared/response-state";
-import {createEffect} from "solid-js";
 import {CheckIcon} from "~/components/Icons";
-
-export enum ModalContentTypeEnum {
-  Processing = "Processing",
-  Images = "Images"
-}
+import {Match, Switch} from "solid-js";
 
 export const Modal = () => {
-  const modalType = submissionLoading() ? ModalContentTypeEnum.Processing : submissionResponseImages() ? ModalContentTypeEnum.Images : null
-
-  if (!modalType) return <></>;
-
   return (
     <div class={"modal-container"}>
       <div class={"modal-blur"}></div>
       <div class={"modal"}>
-        {<ModalContent type={modalType}/>}
+        {<ModalContent/>}
       </div>
     </div>
   )
 }
 
-const ModalContent = ({type}: { type: ModalContentTypeEnum }) => {
-  if (type === ModalContentTypeEnum.Processing) return <ProcessingModalContent/>
+const ModalContent = () =>
+  (
+    <Switch fallback={<p>There was an error building the contents of this message. Please refresh and try again.</p>}>
+      <Match when={submissionStatus() === SubmissionStatusEnum.Initializing}>
+        <InitializingModalContent/>
+      </Match>
+      <Match when={submissionStatus() === SubmissionStatusEnum.InQueue}>
+        <InQueueModalContent/>
+      </Match>
+      <Match when={submissionStatus() === SubmissionStatusEnum.Processing}>
+        <ProcessingModalContent/>
+      </Match>
+      <Match when={submissionStatus() === SubmissionStatusEnum.Complete}>
+        <ImagesModalContent/>
+      </Match>
 
-  if (type === ModalContentTypeEnum.Images) return <ImagesModalContent/>
-  return (
-    <>
-      <p>There was an error building the contents of this message. Please refresh and try again.</p>
-    </>
+    </Switch>
   )
-}
 
 const ProcessingModalContent = () => {
   return (
     <>
-      <p>Your request is processing, please wait. This may take 1-2 minutes.</p>
+      <p>Your submission is now processing in the AI model, this may take about 1-2 minutes.</p>
+      <p>This page will automatically update.</p>
+    </>
+  )
+}
+const InQueueModalContent = () => {
+  return (
+    <>
+      <p>Your position in queue is</p>
+      <p>{queuePosition()}</p>
+      <p>This page will automatically update.</p>
+    </>
+  )
+}
+
+const InitializingModalContent = () => {
+  return (
+    <>
+      <p>Initializing your request, please wait.</p>
       <p>This page will automatically update.</p>
     </>
   )
@@ -55,6 +76,11 @@ const ImagesModalContent = () => {
       <div class={"images-modal-top"}>
         <div class={"images-selector-container"}>
           <button
+            class={selectedImage() === ImageSelectionOption.Og ? "selected" : ""}
+            style={{"background-image": `url("${submissionResponseImages()?.og}")`}}
+            onClick={() => setSelectedImage(ImageSelectionOption.Og)}
+          />
+          <button
             class={selectedImage() === ImageSelectionOption.Seg ? "selected" : ""}
             style={{"background-image": `url("${submissionResponseImages()?.seg}")`}}
             onclick={() => setSelectedImage(ImageSelectionOption.Seg)}
@@ -66,7 +92,7 @@ const ImagesModalContent = () => {
           />
           <button class={"done-button"} onclick={() => resetResponseState()}>
             <span>Done</span>
-            <CheckIcon />
+            <CheckIcon/>
           </button>
         </div>
       </div>

@@ -15,7 +15,7 @@ import {
 } from "solid-start";
 import "./app-styles.css";
 import {Modal} from "~/components/Modal";
-import {submissionLoading, submissionResponseImages} from "~/shared/response-state";
+import {submissionLoading, submissionResponseImages, submissionStatus} from "~/shared/response-state";
 
 export default function Root() {
   const location = useLocation();
@@ -33,7 +33,7 @@ export default function Root() {
       <Body class={"h-screen h-full text-gray-700 bg-neutral-800 flex flex-col justify-between item-center w-screen"}>
         <Suspense>
           <ErrorBoundary>
-            {(submissionLoading() || submissionResponseImages()) && <Modal />}
+            {submissionStatus() !== null && <Modal />}
             <nav class="bg-sky-800 flex space-between items-center w-full">
               <ul class="flex items-center p-3 text-gray-200">
                 <li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>

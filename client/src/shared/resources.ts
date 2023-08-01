@@ -1,10 +1,14 @@
 import wretch, {WretchError} from "wretch";
 import {ErrorHumanMessageEnum, setLastError} from "~/shared/error-state";
 import {appConfig} from "~/shared/config";
-import {Base} from "@solidjs/meta";
 import {BoxDrawing} from "~/shared/drawing-state";
-import {setSubmissionLoading, setSubmissionResponseImages} from "~/shared/response-state";
-import {onMount} from "solid-js";
+import {
+  setQueuePosition,
+  setSubmissionLoading,
+  setSubmissionResponseImages,
+  setSubmissionStatus,
+  SubmissionStatusEnum
+} from "~/shared/response-state";
 
 interface SubmitResponse {
   msg: string;
@@ -66,13 +70,16 @@ export interface SubmissionResponse {
 
 export interface ProcessResponse {
   id: string
+  og_img_path: string,
+  seg_img_path: string,
+  outline_img_path: string
 }
 
 
 let ws: WebSocket | undefined;
 export const submitRequest = async (model: SAMSubmitInput) => {
   try {
-    setSubmissionLoading(true);
+    setSubmissionStatus(SubmissionStatusEnum.Initializing);
 
     const url = `${baseUrl}${EndpointEnum.Process}`;
 
@@ -89,29 +96,28 @@ export const submitRequest = async (model: SAMSubmitInput) => {
       body: formData
     });
 
-    // const data: SubmissionResponse = await response.json()
-    const data: ProcessResponse = await response.json();
+    const {id, outline_img_path, seg_img_path, og_img_path}: ProcessResponse = await response.json();
 
-    if (!data.id) return console.error("Missing id property on data response object.") /* FIXME: (ncn) improve this error handling */
+    if (!id) return console.error("Missing id property on data response object.") /* FIXME: (ncn) improve this error handling */
 
-    ws = new WebSocket(`ws://localhost:8080/ws?queue_id=${data.id}`);
+    setSubmissionStatus(SubmissionStatusEnum.InQueue)
+
+    ws = new WebSocket(`ws://localhost:8080/ws?queue_id=${id}`);
     ws.onmessage = (event) => {
-      console.log("event came in through ws", event);
+      if (event.data === "processing") {
+        setSubmissionStatus(SubmissionStatusEnum.Processing);
+      }
+      if (event.data === "complete") {
+        setSubmissionStatus(SubmissionStatusEnum.Complete)
+        setSubmissionResponseImages({
+          seg: `${baseUrl}${seg_img_path}`,
+          outline: `${baseUrl}${outline_img_path}`,
+          og: `${baseUrl}${og_img_path}`
+        })
+      }
+      setQueuePosition(Number(event.data))
     };
 
-    // const sendMessage = (event) => {
-    //   const input = document.getElementById("messageText");
-    //   ws?.send(input?.value)
-    //   input.value = ''
-    //   event.preventDefault();
-    // }
-
-    setSubmissionLoading(false);
-    // setSubmissionResponseImages({
-    //   seg: `${baseUrl}${data.seg_img_path}`,
-    //   outline: `${baseUrl}${data.outline_img_path}`,
-    // })
-    // console.log("response", data);
   } catch (e) {
     setSubmissionLoading(false);
     setLastError({msg: ErrorHumanMessageEnum.UncaughtError})
