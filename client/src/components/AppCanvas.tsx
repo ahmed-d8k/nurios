@@ -59,7 +59,10 @@ const setupDrawing = () => {
     const diffX = Math.abs(mouseX - startX);
     const diffY = Math.abs(mouseY - startY);
 
-    if (diffX <= 10 || diffY <= 10) return;
+    if (diffX <= 10 || diffY <= 10) {
+      canvas.style.cursor = "default";
+      return setFirstPoint(null);
+    }
 
     canvas.style.cursor = "default";
     setBoxes(p => [...p, {
