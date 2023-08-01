@@ -64,30 +64,37 @@ export interface SubmissionResponse {
   "outline_img_path": string
 }
 
+export interface ProcessResponse {
+  id: string
+}
+
 
 let ws: WebSocket | undefined;
 export const submitRequest = async (model: SAMSubmitInput) => {
   try {
-    // setSubmissionLoading(true);
-    //
-    // const url = `${baseUrl}${EndpointEnum.Submit}`;
-    //
-    // const formData = new FormData();
-    //
-    // formData.append("file", model.file)
-    // formData.append("box_data", JSON.stringify({
-    //   boxes: model.boxes
-    // }));
-    // formData.append("intro", "hello testing");
-    //
-    // const response = await fetch(url, {
-    //   method: 'POST',
-    //   body: formData
-    // });
-    //
-    // const data: SubmissionResponse = await response.json()
+    setSubmissionLoading(true);
 
-    ws = new WebSocket("ws://localhost:8080/ws");
+    const url = `${baseUrl}${EndpointEnum.Process}`;
+
+    const formData = new FormData();
+
+    formData.append("file", model.file)
+    formData.append("box_data", JSON.stringify({
+      boxes: model.boxes
+    }));
+    formData.append("intro", "hello testing");
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+
+    // const data: SubmissionResponse = await response.json()
+    const data: ProcessResponse = await response.json();
+
+    if (!data.id) return console.error("Missing id property on data response object.") /* FIXME: (ncn) improve this error handling */
+
+    ws = new WebSocket(`ws://localhost:8080/ws?queue_id=${data.id}`);
     ws.onmessage = (event) => {
       console.log("event came in through ws", event);
     };
@@ -99,13 +106,15 @@ export const submitRequest = async (model: SAMSubmitInput) => {
     //   event.preventDefault();
     // }
 
-    // setSubmissionLoading(false);
+    setSubmissionLoading(false);
     // setSubmissionResponseImages({
     //   seg: `${baseUrl}${data.seg_img_path}`,
     //   outline: `${baseUrl}${data.outline_img_path}`,
     // })
     // console.log("response", data);
   } catch (e) {
+    setSubmissionLoading(false);
+    setLastError({msg: ErrorHumanMessageEnum.UncaughtError})
     console.error(e)
   }
 
