@@ -37,6 +37,8 @@ enum EndpointEnum {
 const mode = import.meta.env.MODE;
 // @ts-ignore
 const baseUrl = appConfig.serverBaseUrl[mode];
+// @ts-ignore
+const wsBaseUrl = appConfig.wsBaseUrl[mode];
 
 const handle422Err = (err: WretchError) => setLastError({
   msg: ErrorHumanMessageEnum.BadInput,
@@ -102,7 +104,7 @@ export const submitRequest = async (model: SAMSubmitInput) => {
 
     setSubmissionStatus(SubmissionStatusEnum.InQueue)
 
-    ws = new WebSocket(`ws://localhost:8080/ws?queue_id=${id}`);
+    ws = new WebSocket(`${wsBaseUrl}?queue_id=${id}`);
     ws.onmessage = (event) => {
       if (event.data === "processing") {
         setSubmissionStatus(SubmissionStatusEnum.Processing);
