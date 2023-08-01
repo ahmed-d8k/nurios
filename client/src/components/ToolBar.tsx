@@ -8,7 +8,7 @@ import {
   setDrawingColor
 } from "~/shared/drawing-state";
 import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/components/AppCanvas";
-import {createEffect, JSXElement} from "solid-js";
+import {createEffect, JSXElement, onMount} from "solid-js";
 import {submitRequest} from "~/shared/resources";
 import {ColorIcon, ResetIcon, SubmitIcon, UndoIcon, UploadIcon} from "~/components/Icons";
 import {imageHasBeenUploaded, uploadedImageData} from "~/shared/upload-state";
@@ -54,7 +54,6 @@ const ToolBarButton = (props: {
 }
 
 const SubmitButton = () => {
-
   return (
     <button
       class={"flex items-center gap-2 bg-green-600 disabled:bg-neutral-700 rounded-sm p-2 duration-300"}
@@ -63,7 +62,7 @@ const SubmitButton = () => {
         boxes: boxes(),
         file: uploadedImageData().file
       })}
-      disabled={noBoxesDrawn()}
+      // disabled={noBoxesDrawn()}
     >
       <span>Submit</span>
       <SubmitIcon/>
@@ -101,24 +100,11 @@ const UploadImageButton = () => {
 export const ToolBar = () => {
   let drawingColorInputEl: HTMLInputElement | undefined;
   let boxColorInputEl: HTMLInputElement | undefined;
-  const onClick = () => alert("CLICKED");
 
 
   return (
     <div class={"text-white text-md flex justify-center gap-4 items-center"}>
       <UploadImageButton/>
-      {/*<ColorButton*/}
-      {/*  id={"drawing-color"}*/}
-      {/*  label={"Drawing"}*/}
-      {/*  defaultColor={DEFAULT_DRAWING_COLOR}*/}
-      {/*  onChange={(e) => setDrawingColor(e.target.value)}*/}
-      {/*/>*/}
-      {/*<ColorButton*/}
-      {/*  id={"box-color"}*/}
-      {/*  label={"Box"}*/}
-      {/*  defaultColor={DEFAULT_BOX_COLOR}*/}
-      {/*  onChange={(e) => setBoxColor(e.target.value)}*/}
-      {/*/>*/}
       <div class={"flex"}>
         <input
           type="color"
@@ -167,7 +153,3 @@ export const ToolBar = () => {
     </div>
   );
 }
-
-createEffect(() => {
-  console.log("The color is now", boxColor())
-})

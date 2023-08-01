@@ -15,7 +15,7 @@ import {
 } from "solid-start";
 import "./app-styles.css";
 import {Modal} from "~/components/Modal";
-import {submissionLoading, submissionResponseImages} from "~/shared/response-state";
+import {submissionLoading, submissionResponseImages, submissionStatus} from "~/shared/response-state";
 
 export default function Root() {
   const location = useLocation();
@@ -26,17 +26,17 @@ export default function Root() {
   return (
     <Html lang="en">
       <Head>
-        <Title>Nurios - Capstone</Title>
+        <Title>Nurios - SAM Tool</Title>
         <Meta charset="utf-8"/>
         <Meta name="viewport" content="width=device-width, initial-scale=1"/>
       </Head>
       <Body class={"h-screen h-full text-gray-700 bg-neutral-800 flex flex-col justify-between item-center w-screen"}>
         <Suspense>
           <ErrorBoundary>
-            {(submissionLoading() || submissionResponseImages()) && <Modal />}
+            {submissionStatus() !== null && <Modal/>}
             <nav class="bg-sky-800 flex space-between items-center w-full">
               <ul class="flex items-center p-3 text-gray-200">
-                <li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
+                <li class={`border-b-2 ${active("/nurios/")} mx-1.5 sm:mx-6`}>
                   <A href="/">Home</A>
                 </li>
                 <li class={`border-b-2 ${active("/about")} mx-1.5 sm:mx-6`}>
@@ -45,12 +45,14 @@ export default function Root() {
               </ul>
               <ul>
                 <li class={"ml-3"}>
-                  <img
-                    width="35"
-                    height="35"
-                    src={"https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg"}
-                    alt={"GitHub"}
-                  />
+                  <a href={"https://github.com/ahmed-d8k/nurios"} target={"_blank"}>
+                    <img
+                      width="35"
+                      height="35"
+                      src={"https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg"}
+                      alt={"GitHub"}
+                    />
+                  </a>
                 </li>
               </ul>
             </nav>
@@ -64,12 +66,14 @@ export default function Root() {
                 About Page
               </A>
               <span>{" - "}</span>
-              <img
-                width="25"
-                height="25"
-                src={"https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg"}
-                alt={"GitHub"}
-              />
+              <a href={"https://github.com/ahmed-d8k/nurios"} target={"_blank"}>
+                <img
+                  width="25"
+                  height="25"
+                  src={"https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg"}
+                  alt={"GitHub"}
+                />
+              </a>
             </footer>
           </ErrorBoundary>
         </Suspense>

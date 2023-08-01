@@ -15,7 +15,7 @@ export default function Home() {
       <main class={"flex flex-col"}>
         <div class={"flex flex-col mb-24"}>
           <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-4">
-            Capstone
+            Nurios
           </h1>
           <p class={"text-md text-neutral-500"}>
             Tips

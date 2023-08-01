@@ -1,6 +1,6 @@
 import {createSignal, onMount, Show} from "solid-js";
 import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
-import {uploadedImageData, setUploadedImageData} from "~/shared/upload-state";
+import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded, resetImageData} from "~/shared/upload-state";
 
 const canvasId = "main-canvas";
 
@@ -40,6 +40,7 @@ const setupDrawing = () => {
 
   const handleMouseDown = (e: CanvasMouseEvent) => {
     if (e.target.id !== canvasId) return;
+    if (!uploadedImageData().imgData) return;
     const {mouseX, mouseY} = getUsefulDataFromEvent(e);
 
     setFirstPoint([mouseX, mouseY]);
@@ -58,7 +59,10 @@ const setupDrawing = () => {
     const diffX = Math.abs(mouseX - startX);
     const diffY = Math.abs(mouseY - startY);
 
-    if (diffX <= 10 || diffY <= 10) return;
+    if (diffX <= 10 || diffY <= 10) {
+      canvas.style.cursor = "default";
+      return setFirstPoint(null);
+    }
 
     canvas.style.cursor = "default";
     setBoxes(p => [...p, {
@@ -164,6 +168,7 @@ export const handleResetButton = () => {
   // @ts-ignore
   ctx.reset();
   setBoxes([]);
+  resetImageData();
 }
 
 export const handleUndoButton = () => {
