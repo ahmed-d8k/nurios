@@ -38,7 +38,6 @@ const ModalContent = () =>
       <Match when={submissionStatus() === SubmissionStatusEnum.Complete}>
         <ImagesModalContent/>
       </Match>
-
     </Switch>
   )
 
@@ -70,7 +69,6 @@ const InitializingModalContent = () => {
 }
 
 const ImagesModalContent = () => {
-
   return (
     <div class={"images-modal"}>
       <div class={"images-modal-top"}>

@@ -22,7 +22,7 @@ interface SAMInputModelBox {
 }
 
 interface SAMSubmitInput {
-  file?: File;
+  file: Blob | null;
   intro?: string;
   boxes: BoxDrawing[]
 }
@@ -81,6 +81,7 @@ export interface ProcessResponse {
 let ws: WebSocket | undefined;
 export const submitRequest = async (model: SAMSubmitInput) => {
   try {
+    if (!model.file) return console.error("Something went wrong with accessing the model file when trying to submit.");
     setSubmissionStatus(SubmissionStatusEnum.Initializing);
 
     const url = `${baseUrl}${EndpointEnum.Process}`;

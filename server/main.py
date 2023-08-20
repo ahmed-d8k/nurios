@@ -20,7 +20,7 @@ import os
 
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from starlette.websockets import WebSocket
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from min_sam import BackendSAM
 
@@ -229,13 +229,12 @@ async def process_endpoint(file: UploadFile = File(...),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         ) from e
 
-    # TODO: fix this error handling
-    if box_input is None:
-        return {"msg": "bad"}
     if file is None:
-        return {"msg": "bad"}
-    if intro is None:
-        return {"msg": "bad"}
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Must include image data.")
+    # if intro is None:
+    #     return {"msg": "bad"}
+    if box_input is None:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Must include boxes.")
     if len(box_input.boxes) < 1:
         raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED, detail="Need at least 1 box to work with")
     if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
@@ -275,6 +274,25 @@ async def items_endpoint(queue_store: QueueDataStore = Depends(get_queue_store))
     return queue_store.get_all_items()
 
 
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+manager = ConnectionManager()
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket,
                              queue_id: str or None,
@@ -285,30 +303,34 @@ async def websocket_endpoint(websocket: WebSocket,
         return await websocket.close()
 
     await websocket.accept()
-    await wait_for_queue(websocket, queue_id, queue_store)
+    try:
+        await wait_for_queue(websocket, queue_id, queue_store)
 
-    await websocket.send_text("processing")
+        await websocket.send_text("processing")
 
-    og_img_path = f"static/{queue_id}_og.jpg"
-    seg_img_path = f"static/{queue_id}_seg.jpg"
-    outline_img_path = f"static/{queue_id}_outline.jpg"
+        og_img_path = f"static/{queue_id}_og.jpg"
+        seg_img_path = f"static/{queue_id}_seg.jpg"
+        outline_img_path = f"static/{queue_id}_outline.jpg"
 
-    # query to find the transformed boxes from database
-    db_item = await get_item_by_id(queue_id)
-    transformed_boxes = db_item.get("transformed_boxes")
+        # query to find the transformed boxes from database
+        db_item = await get_item_by_id(queue_id)
+        transformed_boxes = db_item.get("transformed_boxes")
 
-    # read from file system and then
-    file_r = cv2.imread(og_img_path)
+        # read from file system and then
+        file_r = cv2.imread(og_img_path)
 
-    # seg_image, outline_image = sam.process(transformed_boxes, file_r)
-    loop = asyncio.get_event_loop()
-    seg_image, outline_image = await loop.run_in_executor(None, lambda: sam.process(transformed_boxes, file_r))
+        # seg_image, outline_image = sam.process(transformed_boxes, file_r)
+        loop = asyncio.get_event_loop()
+        seg_image, outline_image = await loop.run_in_executor(None, lambda: sam.process(transformed_boxes, file_r))
 
-    cv2.imwrite(seg_img_path, seg_image)
-    cv2.imwrite(outline_img_path, outline_image)
+        cv2.imwrite(seg_img_path, seg_image)
+        cv2.imwrite(outline_img_path, outline_image)
 
-    await websocket.send_text("complete")
-    queue_store.remove_item(queue_id)
+        await websocket.send_text("complete")
+        queue_store.remove_item(queue_id)
+    except Exception as e:
+        queue_store.remove_item(queue_id)
+        await websocket.close()
 
 
 def transform_boxes(boxes):
@@ -329,12 +351,10 @@ async def wait_for_queue(ws: WebSocket,
                          queue_id: str,
                          queue_store: QueueDataStore):
     while True:
+        print(queue_store.get_all_items())
         pos = queue_store.pos_in_queue(queue_id)
         if pos == 0:
             return True
 
         await ws.send_text(pos.__str__())
         await asyncio.sleep(5)
-
-# TODO: custom exception handlers
-# TODO: wrap db connection functions with try/catch

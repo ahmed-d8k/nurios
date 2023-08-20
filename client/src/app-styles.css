@@ -91,13 +91,13 @@
 
     .modal-container {
         z-index: 500;
-        backdrop-filter: blur(4px);
-        @apply w-full h-full absolute;
+        @apply w-full min-h-screen absolute h-full;
     }
 
     .modal-blur {
         z-index: 490;
         background-color: rgba(16, 16, 16, .3);
+        backdrop-filter: blur(4px);
         pointer-events: none;
         @apply w-full h-full absolute;
     }

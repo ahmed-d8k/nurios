@@ -21,8 +21,9 @@ export default function Home() {
             Tips
           </p>
           <ul class={"mb-8"}>
-            <li class={"basic-text"}>- Press ctrl + Z to undo last box</li>
-            <li class={"basic-text"}>- Press Esc to stop drawing</li>
+            <li class={"basic-text"}>- Press ctrl + Z to undo last box -</li>
+            <li class={"basic-text"}>- Press Esc to stop drawing -</li>
+            <li class={"basic-text"}>- Right click will delete a box -</li>
           </ul>
           {!!lastError() && <ErrorMenu />}
           <ToolBar />
