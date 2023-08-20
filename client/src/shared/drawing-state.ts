@@ -13,9 +13,20 @@ export interface BoxDrawing {
   height: number
 }
 
-export const [boxes, setBoxes] = createSignal<BoxDrawing[]>([]);
+export const [getBoxes, setBoxes] = createSignal<BoxDrawing[]>([]);
 
-export const noBoxesDrawn = () => boxes().length === 0;
+export const transformBoxes = (boxes = getBoxes()) => boxes.map(box => {
+  const {startX, startY, width, height} = box;
+
+  return {
+    minX: Math.min(startX, startX + width),
+    maxX: Math.max(startX, startX + width),
+    minY: Math.min(startY, startY + height),
+    maxY: Math.max(startY, startY + height)
+  }
+})
+
+export const noBoxesDrawn = () => getBoxes().length === 0;
 
 const setStrokeStyle = (color: string) => {
   const ctx = canvasCtx();

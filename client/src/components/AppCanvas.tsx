@@ -1,5 +1,5 @@
 import {createSignal, JSX, onMount, Show} from "solid-js";
-import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
+import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, getBoxes, transformBoxes} from "~/shared/drawing-state";
 import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded, resetImageData} from "~/shared/upload-state";
 
 const canvasId = "main-canvas";
@@ -9,12 +9,12 @@ type HTMLElementEvent<T extends HTMLElement> = MouseEvent & {
 }
 type CanvasMouseEvent = HTMLElementEvent<HTMLCanvasElement>;
 
-const [getFirstPoint, setGetFirstPoint] = createSignal<[number, number] | null>(null)
-const firstPointExists = () => getFirstPoint() !== null;
+const [getFirstPoint, setFirstPoint] = createSignal<[number, number] | null>(null)
 
 export const [canvasCtx, setCanvasCtx] = createSignal<CanvasRenderingContext2D | null>(null);
 const [canvasRect, setCanvasRect] = createSignal<DOMRect | null>(null);
 
+/* TODO: this function could use some restructuring. wrote it at the beginning of the project when i had no exp with solidjs */
 const setupDrawing = () => {
   const canvas = document.querySelector<HTMLCanvasElement>(`#${canvasId}`);
   const rect = canvas!.getBoundingClientRect();
@@ -38,11 +38,37 @@ const setupDrawing = () => {
     const target = e.target as HTMLCanvasElement;
     if (target.id !== canvasId) return;
     if (!uploadedImageData().imgData) return;
+
+    const isRightClick = e.button === 2;
+    if (isRightClick) return handleRightClick(e);
+
     const mouseX = e.offsetX;
     const mouseY = e.offsetY;
 
-    setGetFirstPoint([mouseX, mouseY]);
+    setFirstPoint([mouseX, mouseY]);
     canvas!.style.cursor = "crosshair";
+  }
+
+  const handleRightClick = (e: MouseEvent) => {
+    console.log("happening")
+    e.preventDefault();
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+    const boxIndex = transformBoxes().findIndex(({minX, maxX, minY, maxY}) =>
+      mouseX >= minX
+      && mouseX <= maxX
+      && mouseY >= minY
+      && mouseY <= maxY)
+
+    console.log(boxIndex);
+
+    if (boxIndex === -1) return;
+
+    setBoxes(prev => [
+      ...prev.slice(0, boxIndex),
+      ...prev.slice(boxIndex + 1)
+    ])
+    redrawAllBoxes();
   }
 
   const handleMouseUp = (e: MouseEvent) => {
@@ -63,7 +89,7 @@ const setupDrawing = () => {
 
     if (diffX <= 10 || diffY <= 10) {
       canvas!.style.cursor = "default";
-      return setGetFirstPoint(null);
+      return setFirstPoint(null);
     }
 
     canvas!.style.cursor = "default";
@@ -75,7 +101,7 @@ const setupDrawing = () => {
     }]);
     redrawAllBoxes();
 
-    return setGetFirstPoint(null);
+    return setFirstPoint(null);
   }
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -102,7 +128,7 @@ const setupDrawing = () => {
 
   const handleKeyPress = (e: KeyboardEvent) => {
     if (e.code === "Escape") {
-      setGetFirstPoint(null);
+      setFirstPoint(null);
       redrawAllBoxes();
       canvas!.style.cursor = "default";
     }
@@ -114,6 +140,10 @@ const setupDrawing = () => {
   canvas!.addEventListener("mousemove", handleMouseMove, false);
   canvas!.addEventListener("mousedown", handleMouseDown, false);
   canvas!.addEventListener("mouseup", handleMouseUp, false);
+  canvas!.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    return false;
+  }, false)
 
   /* keypress doesn't fire when escape is pressed */
   window.addEventListener("keydown", handleKeyPress, false);
@@ -160,7 +190,7 @@ const redrawAllBoxes = () => {
 
   ctx.clearRect(0, 0, rect.width, rect.height);
   ctx.drawImage(imgData, 0, 0);
-  boxes().forEach(box => {
+  getBoxes().forEach(box => {
     ctx.beginPath();
     ctx.rect(box.startX, box.startY, box.width, box.height);
     applyCanvasBoxColor();

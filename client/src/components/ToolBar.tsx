@@ -1,4 +1,4 @@
-import {boxColor, boxes, drawingColor, noBoxesDrawn, setBoxColor, setDrawingColor} from "~/shared/drawing-state";
+import {boxColor, getBoxes, drawingColor, noBoxesDrawn, setBoxColor, setDrawingColor} from "~/shared/drawing-state";
 import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/components/AppCanvas";
 import {JSX, JSXElement} from "solid-js";
 import {submitRequest} from "~/shared/resources";
@@ -34,7 +34,7 @@ const SubmitButton = () => {
       class={"flex items-center gap-2 bg-green-600 disabled:bg-neutral-700 rounded-sm p-2 duration-300"}
       onclick={_ => submitRequest({
         intro: "placeholder intro msg",
-        boxes: boxes(),
+        boxes: getBoxes(),
         file: uploadedImageData().file
       })}
       disabled={noBoxesDrawn()}
