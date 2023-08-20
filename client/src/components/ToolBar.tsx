@@ -1,52 +1,27 @@
-import {
-  boxColor,
-  boxes,
-  DEFAULT_BOX_COLOR,
-  DEFAULT_DRAWING_COLOR, drawingColor,
-  noBoxesDrawn,
-  setBoxColor,
-  setDrawingColor
-} from "~/shared/drawing-state";
+import {boxColor, boxes, drawingColor, noBoxesDrawn, setBoxColor, setDrawingColor} from "~/shared/drawing-state";
 import {handleChangeImageButton, handleResetButton, handleUndoButton} from "~/components/AppCanvas";
-import {createEffect, JSXElement, onMount} from "solid-js";
+import {JSX, JSXElement} from "solid-js";
 import {submitRequest} from "~/shared/resources";
 import {ColorIcon, ResetIcon, SubmitIcon, UndoIcon, UploadIcon} from "~/components/Icons";
 import {imageHasBeenUploaded, uploadedImageData} from "~/shared/upload-state";
-import {JSX} from "solid-js/h/jsx-runtime";
 
-
-const ColorButton = ({id, label, onChange, defaultColor}: {
-  id: string,
-  label: string,
-  onChange: any,
-  defaultColor: string
-}) =>
-  (
-    <div class={"flex flex-col items-center"}>
-      <input
-        type="color"
-        id={id}
-        name={id}
-        onchange={onChange}
-        value={defaultColor}
-      />
-      <label for={id} class={"text-neutral-500"}>{label}</label>
-    </div>
-  )
 
 const ToolBarButton = (props: {
   icon: JSXElement,
   label: string,
-  onClick: Function,
+  onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>,
   flexibleWidth?: boolean
   style?: string | JSX.CSSProperties | undefined;
 }) => {
   return (
-    <button classList={{
-      "tool-button": true,
-      "cursor-pointer": true,
-      "flexible": props.flexibleWidth
-    }} onclick={props.onClick} style={props.style}>
+    <button
+      classList={{
+        "tool-button": true,
+        "cursor-pointer": true,
+        "flexible": props.flexibleWidth
+      }}
+      onclick={props.onClick} style={props.style}
+    >
       {props.icon}
       <label class={"text-neutral-400 hover:text-sky-600 cursor-pointer mt-0.5"}>{props.label}</label>
     </button>
@@ -62,7 +37,7 @@ const SubmitButton = () => {
         boxes: boxes(),
         file: uploadedImageData().file
       })}
-      // disabled={noBoxesDrawn()}
+      disabled={noBoxesDrawn()}
     >
       <span>Submit</span>
       <SubmitIcon/>
@@ -73,9 +48,7 @@ const SubmitButton = () => {
 const UploadImageButton = () => {
   let inputEl: HTMLInputElement | undefined;
 
-  const clickyclicky = () => {
-    inputEl?.click();
-  }
+  const clickGhostFileInput = () => inputEl?.click();
 
   return (
     <>
@@ -90,7 +63,7 @@ const UploadImageButton = () => {
       <ToolBarButton
         icon={<UploadIcon/>}
         label={imageHasBeenUploaded() ? "Change Image" : "Upload Image"}
-        onClick={() => clickyclicky()}
+        onClick={() => clickGhostFileInput()}
         flexibleWidth={true}
       />
     </>

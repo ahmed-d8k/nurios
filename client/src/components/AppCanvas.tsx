@@ -1,4 +1,4 @@
-import {createSignal, onMount, Show} from "solid-js";
+import {createSignal, JSX, onMount, Show} from "solid-js";
 import {applyCanvasDrawingColor, applyCanvasBoxColor, setBoxes, boxes} from "~/shared/drawing-state";
 import {uploadedImageData, setUploadedImageData, imageHasBeenUploaded, resetImageData} from "~/shared/upload-state";
 
@@ -9,21 +9,17 @@ type HTMLElementEvent<T extends HTMLElement> = MouseEvent & {
 }
 type CanvasMouseEvent = HTMLElementEvent<HTMLCanvasElement>;
 
-const getUsefulDataFromEvent = (e: CanvasMouseEvent) => ({
-  mouseX: e.offsetX,
-  mouseY: e.offsetY
-})
-
-const [firstPoint, setFirstPoint] = createSignal<[number, number] | null>(null)
-const firstPointExists = () => firstPoint() !== null;
+const [getFirstPoint, setGetFirstPoint] = createSignal<[number, number] | null>(null)
+const firstPointExists = () => getFirstPoint() !== null;
 
 export const [canvasCtx, setCanvasCtx] = createSignal<CanvasRenderingContext2D | null>(null);
 const [canvasRect, setCanvasRect] = createSignal<DOMRect | null>(null);
 
 const setupDrawing = () => {
   const canvas = document.querySelector<HTMLCanvasElement>(`#${canvasId}`);
-  const rect = canvas.getBoundingClientRect();
+  const rect = canvas!.getBoundingClientRect();
   const ctx = canvas?.getContext("2d");
+  if (!ctx) return console.error("No canvas found.");
   setCanvasCtx(ctx);
   setCanvasRect(rect);
 
@@ -38,33 +34,39 @@ const setupDrawing = () => {
   //   ctx.strokeRect(45, 45, 60, 60);
   // }
 
-  const handleMouseDown = (e: CanvasMouseEvent) => {
-    if (e.target.id !== canvasId) return;
+  const handleMouseDown = (e: MouseEvent) => {
+    const target = e.target as HTMLCanvasElement;
+    if (target.id !== canvasId) return;
     if (!uploadedImageData().imgData) return;
-    const {mouseX, mouseY} = getUsefulDataFromEvent(e);
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
 
-    setFirstPoint([mouseX, mouseY]);
-    canvas.style.cursor = "crosshair";
+    setGetFirstPoint([mouseX, mouseY]);
+    canvas!.style.cursor = "crosshair";
   }
 
-  const handleMouseUp = (e: CanvasMouseEvent) => {
-    if (e.target.id !== canvasId) return;
+  const handleMouseUp = (e: MouseEvent) => {
+    const target = e.target as HTMLCanvasElement;
+    if (target.id !== canvasId) return;
 
     /* if the first point doesn't exist, the user started the click outside the canvas */
-    if (!firstPointExists()) return;
+    const firstPoint = getFirstPoint();
+    if (!firstPoint) return;
 
-    const {mouseX, mouseY} = getUsefulDataFromEvent(e);
-    const [startX, startY] = firstPoint();
+    const [startX, startY] = firstPoint;
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
 
     const diffX = Math.abs(mouseX - startX);
     const diffY = Math.abs(mouseY - startY);
 
     if (diffX <= 10 || diffY <= 10) {
-      canvas.style.cursor = "default";
-      return setFirstPoint(null);
+      canvas!.style.cursor = "default";
+      return setGetFirstPoint(null);
     }
 
-    canvas.style.cursor = "default";
+    canvas!.style.cursor = "default";
     setBoxes(p => [...p, {
       startX,
       startY,
@@ -73,41 +75,45 @@ const setupDrawing = () => {
     }]);
     redrawAllBoxes();
 
-    return setFirstPoint(null);
+    return setGetFirstPoint(null);
   }
 
-  const handleMouseMove = (e: CanvasMouseEvent) => {
-    if (e.target.id != canvasId) return;
-    if (!firstPointExists()) return;
+  const handleMouseMove = (e: MouseEvent) => {
+    const target = e.target as HTMLCanvasElement;
+    if (target.id != canvasId) return;
+
+    const firstPoint = getFirstPoint();
+    if (!firstPoint) return;
 
     redrawAllBoxes();
 
-    const {mouseX, mouseY} = getUsefulDataFromEvent(e);
-    const [startX, startY] = firstPoint();
+    const [startX, startY] = firstPoint;
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
 
     /* draw a dashed line with set color while dragging, then reset back to original rectangle style */
-    ctx.save();
-    ctx.beginPath();
+    ctx!.save();
+    ctx!.beginPath();
     applyCanvasDrawingColor();
-    ctx.setLineDash([6]);
-    ctx.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
-    ctx.restore();
+    ctx!.setLineDash([6]);
+    ctx!.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
+    ctx!.restore();
   }
 
   const handleKeyPress = (e: KeyboardEvent) => {
     if (e.code === "Escape") {
-      setFirstPoint(null);
+      setGetFirstPoint(null);
       redrawAllBoxes();
-      canvas.style.cursor = "default";
+      canvas!.style.cursor = "default";
     }
     if (e.ctrlKey && e.key === "z") {
       handleUndoButton()
     }
   }
 
-  canvas.addEventListener("mousemove", handleMouseMove, false);
-  canvas.addEventListener("mousedown", handleMouseDown, false);
-  canvas.addEventListener("mouseup", handleMouseUp, false);
+  canvas!.addEventListener("mousemove", handleMouseMove, false);
+  canvas!.addEventListener("mousedown", handleMouseDown, false);
+  canvas!.addEventListener("mouseup", handleMouseUp, false);
 
   /* keypress doesn't fire when escape is pressed */
   window.addEventListener("keydown", handleKeyPress, false);
@@ -116,12 +122,13 @@ const setupDrawing = () => {
 const setupUpload = () => {
   const inputEle = document.querySelector<HTMLInputElement>("#upload-input");
 
-  const handleImageUploadSelected = (e) => {
-    if (e.target.files.length === 0) return;
+  const handleImageUploadSelected = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files?.length === 0) return;
     const ctx = canvasCtx();
     if (!ctx) return;
 
-    const file = e.target.files[0]; /* only allow 1 file uploaded */
+    const file = target.files[0]; /* only allow 1 file uploaded */
 
     const img = new Image();
     img.onload = () => {
@@ -136,7 +143,7 @@ const setupUpload = () => {
     img.src = URL.createObjectURL(file);
   }
 
-  inputEle?.addEventListener("change", handleImageUploadSelected)
+  inputEle!.addEventListener("change", e => handleImageUploadSelected(e))
   /* TODO: handle err */
 }
 
