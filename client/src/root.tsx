@@ -33,7 +33,7 @@ export default function Root() {
       <Body class={"min-h-screen h-full text-gray-700 bg-neutral-800 w-screen relative flex flex-col justify-between item-center"}>
         <Suspense>
           <ErrorBoundary>
-            {<Modal/>}
+            {submissionStatus() !== null && <Modal/>}
             <nav class="bg-sky-800 flex space-between items-center w-full">
               <ul class="flex items-center p-3 text-gray-200">
                 <li class={`border-b-2 ${active("/nurios/")} mx-1.5 sm:mx-6`}>
