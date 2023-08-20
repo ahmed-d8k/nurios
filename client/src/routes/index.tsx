@@ -17,18 +17,22 @@ export default function Home() {
           <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-4">
             Nurios
           </h1>
-          <p class={"text-md text-neutral-500"}>
+          <p class={"text-md text-neutral-500 desktop-only"}>
             Tips
           </p>
-          <ul class={"mb-8"}>
+          <ul class={"mb-8 desktop-only"}>
             <li class={"basic-text"}>- Press ctrl + Z to undo last box -</li>
             <li class={"basic-text"}>- Press Esc to stop drawing -</li>
             <li class={"basic-text"}>- Right click will delete a box -</li>
           </ul>
-          {!!lastError() && <ErrorMenu />}
-          <ToolBar />
+          {!!lastError() && <ErrorMenu/>}
+          <ToolBar/>
+          <AppCanvas/>
+          <div class={"mobile-only flex-col mt-56 text-neutral-300"}>
+            <p>Nurios is not supported on small screen sizes yet.</p>
+          </div>
         </div>
-        <AppCanvas/>
+
       </main>
     </div>
   );

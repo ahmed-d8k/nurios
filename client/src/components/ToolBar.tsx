@@ -76,7 +76,7 @@ export const ToolBar = () => {
 
 
   return (
-    <div class={"text-white text-md flex justify-center gap-4 items-center"}>
+    <div class={"text-white text-md flex justify-center gap-4 items-center desktop-only mb-8"}>
       <UploadImageButton/>
       <div class={"flex"}>
         <input

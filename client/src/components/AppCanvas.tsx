@@ -226,7 +226,7 @@ export const AppCanvas = () => {
 
   return (
     <>
-      <div class={"relative flex justify-center"}>
+      <div class={"relative flex justify-center desktop-only"}>
         <Show when={!uploadedImageData().file}>
           <div class={"absolute image-prompt z-10"}>Upload an image to begin</div>
         </Show>

@@ -167,4 +167,19 @@
     /*.input {*/
     /*    @apply outline-none bg-none;*/
     /*}*/
+
+    .desktop-only {
+        display: block;
+    }
+
+    .mobile-only {
+        @apply md:hidden;
+    }
+
+}
+
+@media screen and (max-width: 720px) {
+    .desktop-only {
+        display: none;
+    }
 }
