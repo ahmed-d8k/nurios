@@ -34,4 +34,4 @@ sudo docker run -d -p 8080:8080 \
 -e COSMOS_KEY=<your key> \
 --name cap-container cap
 ```
-3. Test the server by running `curl localhost/ping`
+3. Test the server by running `curl localhost/ping` 
